@@ -19,17 +19,15 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      // 验证密码
       if (password !== confirmPassword) {
         setError('两次输入的密码不一致');
         return;
       }
 
-      // 注册用户
       await registerUser(username, password);
       router.push('/login?registered=true');
-    } catch (error: any) {
-      setError(error.message || '注册失败，请重试');
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : '注册失败，请重试');
     } finally {
       setIsLoading(false);
     }

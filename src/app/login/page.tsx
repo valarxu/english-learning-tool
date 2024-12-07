@@ -21,7 +21,7 @@ export default function LoginPage() {
       if (!success) {
         setError('用户名或密码错误');
       }
-    } catch (_error) {
+    } catch {
       setError('登录失败，请重试');
     } finally {
       setIsLoading(false);

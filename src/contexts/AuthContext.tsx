@@ -85,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       router.replace('/');
       
       return true;
-    } catch (_error) {
+    } catch {
       return false;
     }
   };
