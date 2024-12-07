@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { authenticateUser } from '../services/auth';
 
@@ -25,12 +25,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  // 初始化时检查认证状态
-  useEffect(() => {
-    checkAuth();
-  }, []);
+  const handleNotAuthenticated = useCallback(() => {
+    setIsAuthenticated(false);
+    setUsername(null);
+    setIsLoading(false);
+    
+    if (pathname !== '/login') {
+      router.replace('/login');
+    }
+  }, [pathname, router]);
 
-  const checkAuth = () => {
+  const checkAuth = useCallback(() => {
     setIsLoading(true);
     const authData = localStorage.getItem('auth');
 
@@ -42,17 +47,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const { username, expiresAt } = JSON.parse(authData);
       if (new Date(expiresAt) < new Date()) {
-        // Token 过期
         localStorage.removeItem('auth');
         handleNotAuthenticated();
         return;
       }
 
-      // 有效的认证
       setIsAuthenticated(true);
       setUsername(username);
 
-      // 如果在登录页且已认证，重定向到首页
       if (pathname === '/login') {
         router.replace('/');
       }
@@ -61,18 +63,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [router, pathname, handleNotAuthenticated]);
 
-  const handleNotAuthenticated = () => {
-    setIsAuthenticated(false);
-    setUsername(null);
-    setIsLoading(false);
-    
-    // 如果不在登录页，重定向到登录页
-    if (pathname !== '/login') {
-      router.replace('/login');
-    }
-  };
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   const login = async (username: string, password: string) => {
     try {
@@ -90,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       router.replace('/');
       
       return true;
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   };

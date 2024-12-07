@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../config/supabase';
 import { Card } from '../types/card';
 import { Word } from '../types/word';
@@ -14,7 +14,7 @@ export function useCards() {
   const { username } = useAuth();
 
   // 获取卡片列表
-  const fetchCards = async () => {
+  const fetchCards = useCallback(async () => {
     if (!username) return;
     
     try {
@@ -41,7 +41,7 @@ export function useCards() {
     } catch (error) {
       console.error('Error in fetchCards:', error);
     }
-  };
+  }, [username]);
 
   // 添加卡片
   const addCard = async (card: Omit<Card, 'id' | 'createdAt' | 'updatedAt'>) => {
@@ -131,7 +131,7 @@ export function useCards() {
     if (username) {
       fetchCards();
     }
-  }, [username]);
+  }, [username, fetchCards]);
 
   return {
     cards,

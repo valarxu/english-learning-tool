@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useCards } from "../../hooks/useCards";
 import { Card } from "../../types/card";
 import { Word } from "../../types/word";  // 从正确的位置导入 Word 类型
@@ -33,22 +33,22 @@ export default function VocabularyPage() {
   const [wordToDelete, setWordToDelete] = useState<Word | null>(null);
   const { speak } = useSpeech();
 
-  const resetNewCard = () => {
+  const resetNewCard = useCallback(() => {
     setNewCard({
       title: '',
       description: '',
       category: '',
       userId: username || '',
     });
-  };
+  }, [username]);
 
-  const resetNewWord = () => {
+  const resetNewWord = useCallback(() => {
     setNewWord({
       word: '',
       meaning: '',
       userId: username || '',
     });
-  };
+  }, [username]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -124,7 +124,7 @@ export default function VocabularyPage() {
   useEffect(() => {
     resetNewCard();
     resetNewWord();
-  }, [username]);
+  }, [username, resetNewCard, resetNewWord]);
 
   return (
     <ProtectedRoute>
@@ -354,7 +354,7 @@ export default function VocabularyPage() {
             <div className="bg-white rounded-2xl p-6 w-full max-w-md border border-gray-100 shadow-2xl">
               <h3 className="text-xl font-medium text-gray-800 mb-4">确认删除</h3>
               <p className="text-gray-600 mb-6">
-                确定要删除场景 "{cardToDelete.title}" 吗？该操作将同时删除场景下的所有单词，且不可恢复。
+                确定要删除场景 &quot;{cardToDelete.title}&quot; 吗？该操作将同时删除场景下的所有单词，且不可恢复。
               </p>
               <div className="flex justify-end space-x-4">
                 <button
@@ -380,7 +380,7 @@ export default function VocabularyPage() {
             <div className="bg-white rounded-2xl p-6 w-full max-w-md border border-gray-100 shadow-2xl">
               <h3 className="text-xl font-medium text-gray-800 mb-4">确认删除单词</h3>
               <p className="text-gray-600 mb-6">
-                确定要删除单词 "{wordToDelete.word}" 吗？此操作不可恢复。
+                确定要删除单词 &quot;{wordToDelete.word}&quot; 吗？此操作不可恢复。
               </p>
               <div className="flex justify-end space-x-4">
                 <button
@@ -393,7 +393,7 @@ export default function VocabularyPage() {
                   onClick={confirmDeleteWord}
                   className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-all duration-300"
                 >
-                  ��认删除
+                  确认删除
                 </button>
               </div>
             </div>
