@@ -76,12 +76,12 @@ export default function LoginPage() {
             {isLoading ? '登录中...' : '登录'}
           </button>
 
-          <div className="text-center text-gray-600">
+          {/* <div className="text-center text-gray-600">
             没有账号？
             <Link href="/register" className="text-emerald-600 hover:text-emerald-700 ml-1">
               去注册
             </Link>
-          </div>
+          </div> */}
         </form>
       </div>
     </div>
