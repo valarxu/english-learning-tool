@@ -36,13 +36,30 @@ export default function Home() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-emerald-300/80 via-green-400/70 to-teal-500/80 p-5">
+      <div className="min-h-screen bg-gradient-to-br from-emerald-200/70 via-green-300/60 to-teal-400/70 p-5">
         {/* 添加登出按钮 */}
         <button
           onClick={logout}
-          className="absolute top-4 right-4 px-4 py-2 rounded-lg bg-white/90 text-emerald-600 hover:bg-white transition-all duration-300 backdrop-blur-md font-medium"
+          className="absolute top-4 right-4 px-4 py-2 rounded-lg bg-white/90 text-emerald-600 
+            transition-all duration-300 backdrop-blur-md font-medium
+            hover:bg-red-50 hover:text-red-600 hover:shadow-lg hover:scale-105 hover:-translate-y-0.5
+            active:scale-95 active:translate-y-0
+            flex items-center gap-2 group"
         >
-          登出
+          <span>登出</span>
+          <svg 
+            className="w-4 h-4 transform transition-transform duration-300 group-hover:translate-x-1" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M17 8l4 4m0 0l-4 4m4-4H7m6 4v2a3 3 0 01-3 3H6a3 3 0 01-3-3V6a3 3 0 013-3h4a3 3 0 013 3v2" 
+            />
+          </svg>
         </button>
         
         <div className="max-w-6xl mx-auto">

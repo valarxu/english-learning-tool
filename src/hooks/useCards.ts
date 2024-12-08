@@ -11,12 +11,14 @@ export interface CardWithWordCount extends Card {
 
 export function useCards() {
   const [cards, setCards] = useState<CardWithWordCount[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { username } = useAuth();
 
   // 获取卡片列表
   const fetchCards = useCallback(async () => {
     if (!username) return;
     
+    setIsLoading(true);
     try {
       const { data, error } = await supabase
         .from('cards')
@@ -27,11 +29,8 @@ export function useCards() {
         .eq('user_id', username)
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching cards:', error);
-        return;
-      }
-
+      if (error) throw error;
+      
       const cardsWithCount = (data || []).map(card => ({
         ...card,
         wordCount: card.words?.[0]?.count || 0
@@ -39,7 +38,9 @@ export function useCards() {
 
       setCards(cardsWithCount);
     } catch (error) {
-      console.error('Error in fetchCards:', error);
+      console.error('Error fetching cards:', error);
+    } finally {
+      setIsLoading(false);
     }
   }, [username]);
 
@@ -135,6 +136,7 @@ export function useCards() {
 
   return {
     cards,
+    isLoading,
     addCard,
     addWordToCard,
     getWordsForCard,

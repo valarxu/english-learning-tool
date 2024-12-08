@@ -34,7 +34,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-300/80 via-green-400/70 to-teal-500/80 flex items-center justify-center p-5">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-200/70 via-green-300/60 to-teal-400/70 flex items-center justify-center p-5">
       <div className="bg-white/90 rounded-xl p-8 shadow-lg w-full max-w-md">
         <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">注册账号</h1>
         

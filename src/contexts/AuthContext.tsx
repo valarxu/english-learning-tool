@@ -99,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-300/80 via-green-400/70 to-teal-500/80 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-emerald-200/70 via-green-300/60 to-teal-400/70 flex items-center justify-center">
         <div className="text-white text-lg">加载中...</div>
       </div>
     );
