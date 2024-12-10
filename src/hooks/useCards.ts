@@ -88,7 +88,7 @@ export function useCards() {
       console.error('Error adding word:', error);
       throw error;
     }
-    await fetchCards();
+    
     return data;
   };
 
@@ -142,5 +142,6 @@ export function useCards() {
     getWordsForCard,
     deleteCard,
     deleteWord,
+    fetchCards,
   };
 }

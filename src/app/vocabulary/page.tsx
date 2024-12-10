@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { useCards } from "../../hooks/useCards";
 import { Card } from "../../types/card";
 import { Word } from "../../types/word";  // 从正确的位置导入 Word 类型
@@ -11,7 +11,7 @@ import ProtectedRoute from '../../components/ProtectedRoute';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function VocabularyPage() {
-  const { cards = [], addCard, addWordToCard, getWordsForCard, deleteCard, deleteWord, isLoading } = useCards();
+  const { cards = [], addCard, addWordToCard, getWordsForCard, deleteCard, deleteWord, isLoading, fetchCards } = useCards();
   const { username } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isWordModalOpen, setIsWordModalOpen] = useState(false);
@@ -32,6 +32,7 @@ export default function VocabularyPage() {
   const [cardToDelete, setCardToDelete] = useState<CardWithWordCount | null>(null);
   const [wordToDelete, setWordToDelete] = useState<Word | null>(null);
   const { speak } = useSpeech();
+  const wordInputRef = useRef<HTMLInputElement>(null);
 
   const resetNewCard = useCallback(() => {
     setNewCard({
@@ -73,6 +74,7 @@ export default function VocabularyPage() {
       const updatedWords = await getWordsForCard(selectedCard.id);
       setCardWords(updatedWords);
       resetNewWord();
+      wordInputRef.current?.focus();
     }
   };
 
@@ -134,21 +136,49 @@ export default function VocabularyPage() {
     resetNewWord();
   }, [username, resetNewCard, resetNewWord]);
 
+  // 添加统计计算
+  const totalWords = useMemo(() => {
+    return cards.reduce((sum, card) => sum + card.wordCount, 0);
+  }, [cards]);
+
+  const handleCloseWordModal = async () => {
+    setIsWordModalOpen(false);
+    await fetchCards(); // Modal 关闭时更新场景列表
+  };
+
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gradient-to-br from-emerald-200/70 via-green-300/60 to-teal-400/70 p-5 relative">
-        {/* 返回首页按钮 */}
-        <Link 
-          href="/"
-          className="absolute top-4 left-4 px-4 py-2 rounded-lg bg-white/90 text-emerald-600 
-            transition-all duration-300 backdrop-blur-md font-medium
-            hover:shadow-lg hover:scale-105 hover:-translate-y-0.5 
-            active:scale-95 active:translate-y-0
-            flex items-center gap-1 group"
-        >
-          <span className="transform transition-transform duration-300 group-hover:-translate-x-1">←</span>
-          <span>返回首页</span>
-        </Link>
+        {/* 顶部导航栏 */}
+        <div className="absolute top-4 left-4 right-4 flex items-center">
+          {/* 返回首页按钮 */}
+          <Link 
+            href="/"
+            className="px-4 py-2 rounded-lg bg-white/90 text-emerald-600 
+              transition-all duration-300 backdrop-blur-md font-medium
+              hover:shadow-lg hover:scale-105 hover:-translate-y-0.5 
+              active:scale-95 active:translate-y-0
+              flex items-center gap-1 group"
+          >
+            <span className="transform transition-transform duration-300 group-hover:-translate-x-1">←</span>
+            <span>返回首页</span>
+          </Link>
+
+          {/* 统计信息 */}
+          <div className="ml-4 bg-white/90 rounded-lg px-4 py-2 shadow-lg flex items-center">
+            <div className="flex gap-6">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-500">场景数量</span>
+                <span className="text-emerald-600 font-medium">{cards.length}</span>
+              </div>
+              <div className="w-px h-5 bg-gray-200"></div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-500">单词总数</span>
+                <span className="text-emerald-600 font-medium">{totalWords}</span>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* 卡片列表 */}
         {isLoading ? (
@@ -299,7 +329,7 @@ export default function VocabularyPage() {
         {isWordModalOpen && selectedCard && (
           <div 
             className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center p-4 z-50"
-            onClick={() => setIsWordModalOpen(false)}
+            onClick={handleCloseWordModal}
           >
             <div 
               className="bg-white rounded-2xl p-6 w-full max-w-4xl border border-gray-100 shadow-2xl max-h-[80vh] overflow-y-auto"
@@ -311,7 +341,7 @@ export default function VocabularyPage() {
                   <p className="text-gray-500">共 {cardWords.length} 个单词</p>
                 </div>
                 <button
-                  onClick={() => setIsWordModalOpen(false)}
+                  onClick={handleCloseWordModal}
                   className="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700 flex items-center justify-center transition-all duration-300"
                 >
                   ✕
@@ -324,6 +354,7 @@ export default function VocabularyPage() {
                   <div className="flex-1">
                     <label className="block text-gray-700 mb-2 font-medium">单词</label>
                     <input
+                      ref={wordInputRef}
                       type="text"
                       value={newWord.word}
                       onChange={(e) => setNewWord({ ...newWord, word: e.target.value })}
