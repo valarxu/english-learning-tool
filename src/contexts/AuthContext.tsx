@@ -7,6 +7,7 @@ import { authenticateUser } from '../services/auth';
 interface AuthContextType {
   isAuthenticated: boolean;
   username: string | null;
+  user: { id: string } | null;
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
@@ -14,6 +15,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   username: null,
+  user: null,
   login: async () => false,
   logout: () => {},
 });
@@ -106,7 +108,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, username, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, username, user: null, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
