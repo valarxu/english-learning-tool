@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
 import ReactECharts from 'echarts-for-react';
@@ -23,7 +23,7 @@ export default function CryptoPage() {
   const [loadingStates, setLoadingStates] = useState<LoadingState>({});
   const [lastUpdateTime, setLastUpdateTime] = useState<string>('');
 
-  const { symbols, fetchSymbols, addSymbol, removeSymbol } = useCryptoSymbols();
+  const { symbols, addSymbol, removeSymbol } = useCryptoSymbols();
 
   const MAX_RETRIES = 3;
   const RETRY_DELAY = 30000; // 30秒
@@ -62,7 +62,8 @@ export default function CryptoPage() {
         await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
         return fetchSymbolData(symbol, retryCount + 1);
       }
-      throw new Error(`获取 ${symbol} 数据失败`);
+      const errorMessage = err instanceof Error ? err.message : '获取数据失败';
+      throw new Error(`获取 ${symbol} 数据失败: ${errorMessage}`);
     }
   }, []);
 
@@ -100,8 +101,11 @@ export default function CryptoPage() {
     setIsLoading(false);
   }, [symbols, fetchSingleSymbol]);
 
+  const initialLoadDone = useRef(false);
+
   useEffect(() => {
-    if (symbols.length > 0) {
+    if (symbols.length > 0 && !initialLoadDone.current) {
+      initialLoadDone.current = true;
       void fetchKlineData();
     }
   }, [symbols, fetchKlineData]);
@@ -130,7 +134,7 @@ export default function CryptoPage() {
     }
   };
 
-  const formatPrice = (price: number, symbol: string) => {
+  const formatPrice = (price: number) => {
     if (price < 0.0001) {
       return price.toFixed(8);
     }
@@ -192,7 +196,7 @@ export default function CryptoPage() {
           gridIndex: 0,
           show: false,
           axisLabel: {
-            formatter: (value: number) => formatPrice(value, symbol)
+            formatter: (value: number) => formatPrice(value)
           }
         },
         {
@@ -246,17 +250,6 @@ export default function CryptoPage() {
   const handleModalClick = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
-
-  // 使用 useMemo 优化计算密集型操作
-  const getMinMaxPrice = useCallback((data: KLineData[]) => {
-    const lows = data.map(d => d.low);
-    const highs = data.map(d => d.high);
-    return {
-      min: Math.min(...lows),
-      max: Math.max(...highs),
-      close: data[data.length - 1].close
-    };
-  }, []);
 
   useEffect(() => {
     if (error) {
@@ -319,13 +312,13 @@ export default function CryptoPage() {
                     <div className="mb-1 flex flex-wrap items-center gap-x-3 px-1">
                       <span className="text-base font-bold text-blue-400">{symbol}</span>
                       <span className="text-sm text-blue-400 whitespace-nowrap">
-                        Close: {formatPrice(klineData[symbol][klineData[symbol].length - 1].close, symbol)}
+                        Close: {formatPrice(klineData[symbol][klineData[symbol].length - 1].close)}
                       </span>
                       <span className="text-sm text-red-500 whitespace-nowrap">
-                        Min: {formatPrice(Math.min(...klineData[symbol].map(d => d.low)), symbol)}
+                        Min: {formatPrice(Math.min(...klineData[symbol].map(d => d.low)))}
                       </span>
                       <span className="text-sm text-green-500 whitespace-nowrap">
-                        Max: {formatPrice(Math.max(...klineData[symbol].map(d => d.high)), symbol)}
+                        Max: {formatPrice(Math.max(...klineData[symbol].map(d => d.high)))}
                       </span>
                     </div>
                     <ReactECharts 

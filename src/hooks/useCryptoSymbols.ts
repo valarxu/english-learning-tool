@@ -94,13 +94,13 @@ export function useCryptoSymbols() {
     }
   };
 
-  // 只在组件首次挂载且有 username 时获取一次数据
+  // 只在首次加载时获取数据
   useEffect(() => {
     if (username && !initialFetchDone.current) {
       initialFetchDone.current = true;
-      fetchSymbols();
+      void fetchSymbols();
     }
-  }, [username]);
+  }, [username, fetchSymbols]);
 
   return {
     symbols,
