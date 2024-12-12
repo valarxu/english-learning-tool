@@ -30,17 +30,25 @@ export default function CryptoPage() {
 
   const fetchSymbolData = useCallback(async (symbol: string, retryCount = 0): Promise<KLineData[]> => {
     try {
+      // 获取北京时间的今天凌晨
       const endTime = new Date();
+      // 转换为北京时间
+      endTime.setHours(endTime.getHours() + 8);
       endTime.setHours(0, 0, 0, 0);
+      
       const startTime = new Date(endTime);
-      startTime.setDate(startTime.getDate() - 31);
+      startTime.setDate(startTime.getDate() - 31);  // 31天前
+
+      // 转换回 UTC 时间戳
+      const endTimeUTC = new Date(endTime.getTime() - 8 * 60 * 60 * 1000);
+      const startTimeUTC = new Date(startTime.getTime() - 8 * 60 * 60 * 1000);
 
       const response = await axios.get('https://api.binance.com/api/v3/klines', {
         params: {
           symbol: `${symbol}USDT`,
           interval: '1d',
-          startTime: startTime.getTime(),
-          endTime: endTime.getTime() - 1,
+          startTime: startTimeUTC.getTime(),
+          endTime: endTimeUTC.getTime() - 1,
           limit: 30
         }
       });

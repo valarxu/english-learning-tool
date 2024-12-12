@@ -101,7 +101,7 @@ export default function Home() {
           {/* 底部信息 */}
           <div className="text-center mt-12">
             <p className="text-gray-500 text-sm">
-              Version 1.0.0 | Made with ❤️
+              Version 1.0.0 | Made with 阿吉❤️
             </p>
           </div>
         </div>
