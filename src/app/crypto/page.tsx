@@ -3,27 +3,60 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
-import ReactECharts from 'echarts-for-react';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useCryptoSymbols } from '@/hooks/useCryptoSymbols';
 import type { KLineData, CryptoData, LoadingState } from '@/types/crypto';
+import type { CryptoTab, TabConfig } from '@/types/crypto-tabs';
+import MainstreamCoins from './components/MainstreamCoins';
+import MemeCoins from './components/MemeCoins';
+import OtherData from './components/OtherData';
+import WalletMonitor from './components/WalletMonitor';
+import ManageSymbolsModal from './components/ManageSymbolsModal';
+import type { MemeTokenData } from '@/types/crypto';
 
-// 添加 ECharts 相关类型
-type EChartsOption = echarts.EChartsOption;
-type ItemStyleParams = {
-  dataIndex: number;
-};
+// 移除未使用的 ECharts 相关类型
+const TABS: TabConfig[] = [
+  { key: 'mainstream', label: '主流货币', icon: '💰' },
+  { key: 'meme', label: 'Meme币', icon: '🐕' },
+  { key: 'others', label: '其他数据', icon: '📊' },
+  { key: 'wallet', label: '钱包监控', icon: '👛' },
+];
 
 export default function CryptoPage() {
-  const [klineData, setKlineData] = useState<CryptoData>({});
-  const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<CryptoTab>('mainstream');
+  
+  // 主流货币状态
+  const [mainstreamData, setMainstreamData] = useState<CryptoData>({});
+  const [mainstreamLoading, setMainstreamLoading] = useState(false);
+  const [mainstreamLoadingStates, setMainstreamLoadingStates] = useState<LoadingState>({});
+  const [mainstreamLastUpdate, setMainstreamLastUpdate] = useState<string>('');
+  const [mainstreamNewSymbol, setMainstreamNewSymbol] = useState('');
+  
+  // 通用状态
   const [error, setError] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newSymbol, setNewSymbol] = useState('');
-  const [loadingStates, setLoadingStates] = useState<LoadingState>({});
-  const [lastUpdateTime, setLastUpdateTime] = useState<string>('');
+  const [isMainstreamModalOpen, setIsMainstreamModalOpen] = useState(false);
 
-  const { symbols, addSymbol, removeSymbol } = useCryptoSymbols();
+  const { 
+    symbols: mainstreamSymbols, 
+    addSymbol: addMainstreamSymbol, 
+    removeSymbol: removeMainstreamSymbol 
+  } = useCryptoSymbols('mainstream');
+
+  // 添加 Meme 币管理相关状态
+  const [isMemeModalOpen, setIsMemeModalOpen] = useState(false);
+  const [memeNewSymbol, setMemeNewSymbol] = useState('');
+
+  // 添加 Meme 币的 hook
+  const { 
+    symbols: memeSymbols, 
+    addSymbol: addMemeSymbol, 
+    removeSymbol: removeMemeSymbol 
+  } = useCryptoSymbols('meme');
+
+  // 添加 Meme 币数据状态
+  const [memeTokensData, setMemeTokensData] = useState<Record<string, MemeTokenData>>({});
+  const [isMemeDataLoading, setIsMemeDataLoading] = useState(false);
+  const [memeLastUpdate, setMemeLastUpdate] = useState<string>('');
 
   const MAX_RETRIES = 3;
   const RETRY_DELAY = 30000; // 30秒
@@ -75,190 +108,50 @@ export default function CryptoPage() {
     }
   }, []);
 
-  const fetchSingleSymbol = useCallback(async (symbol: string) => {
-    setLoadingStates(prev => ({ ...prev, [symbol]: true }));
+  // 主流货币相关函数
+  const fetchMainstreamData = useCallback(async () => {
+    if (mainstreamSymbols.length === 0) return;
     
-    try {
-      const data = await fetchSymbolData(symbol, 0);
-      setKlineData(prev => ({
-        ...prev,
-        [symbol]: data
-      }));
-    } catch {
-      // 单个货币的错误不影响整体状态
-    } finally {
-      setLoadingStates(prev => ({ ...prev, [symbol]: false }));
-    }
-  }, [fetchSymbolData]);
-
-  const fetchKlineData = useCallback(async () => {
-    if (symbols.length === 0) return;
-    
-    setIsLoading(true);
+    setMainstreamLoading(true);
     setError(null);
     
     const initialLoadingStates: LoadingState = {};
-    symbols.forEach(symbol => {
+    mainstreamSymbols.forEach(symbol => {
       initialLoadingStates[symbol] = true;
     });
-    setLoadingStates(initialLoadingStates);
+    setMainstreamLoadingStates(initialLoadingStates);
 
-    await Promise.all(symbols.map(fetchSingleSymbol));
+    try {
+      const results = await Promise.all(
+        mainstreamSymbols.map(symbol => fetchSymbolData(symbol))
+      );
 
-    setLastUpdateTime(new Date().toLocaleString());
-    setIsLoading(false);
-  }, [symbols, fetchSingleSymbol]);
+      const newData: CryptoData = {};
+      mainstreamSymbols.forEach((symbol, index) => {
+        newData[symbol] = results[index];
+      });
 
-  const initialLoadDone = useRef(false);
+      setMainstreamData(newData);
+      setMainstreamLastUpdate(new Date().toLocaleString());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '获取数据失败');
+    } finally {
+      setMainstreamLoading(false);
+      setMainstreamLoadingStates({});
+    }
+  }, [mainstreamSymbols, fetchSymbolData]);
+
+  // 初始加载
+  const mainstreamInitialLoad = useRef(false);
 
   useEffect(() => {
-    if (symbols.length > 0 && !initialLoadDone.current) {
-      initialLoadDone.current = true;
-      void fetchKlineData();
+    if (mainstreamSymbols.length > 0 && !mainstreamInitialLoad.current) {
+      mainstreamInitialLoad.current = true;
+      void fetchMainstreamData();
     }
-  }, [symbols, fetchKlineData]);
+  }, [mainstreamSymbols, fetchMainstreamData]);
 
-  const handleAddSymbol = async () => {
-    if (!newSymbol) return;
-    
-    try {
-      await addSymbol(newSymbol);
-      setNewSymbol('');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '添加货币失败');
-    }
-  };
-
-  const handleRemoveSymbol = async (symbol: string) => {
-    try {
-      await removeSymbol(symbol);
-      setKlineData(prev => {
-        const newData = { ...prev };
-        delete newData[symbol];
-        return newData;
-      });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '删除货币失败');
-    }
-  };
-
-  const formatPrice = (price: number) => {
-    if (price < 0.0001) {
-      return price.toFixed(8);
-    }
-    
-    return price.toLocaleString(undefined, {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: price < 1 ? 6 : 2
-    });
-  };
-
-  const getChartOption = (symbol: string, data: KLineData[]): EChartsOption => {
-    return {
-      grid: [
-        {
-          left: '4%',
-          right: '4%',
-          top: '4%',
-          height: '60%'
-        },
-        {
-          left: '4%',
-          right: '4%',
-          top: '75%',
-          height: '20%'
-        }
-      ],
-      xAxis: [
-        {
-          type: 'category',
-          data: data.map(item => item.time),
-          gridIndex: 0,
-          show: true,
-          axisLabel: {
-            show: false
-          },
-          axisTick: { 
-            show: false  // 隐藏刻度线
-          },
-          axisLine: { 
-            show: true,  // 显示轴线
-            lineStyle: {
-              color: '#ddd'
-            }
-          }
-        },
-        {
-          type: 'category',
-          data: data.map(item => item.time),
-          gridIndex: 1,
-          show: false
-        }
-      ],
-      yAxis: [
-        {
-          scale: true,
-          splitArea: {
-            show: true
-          },
-          gridIndex: 0,
-          show: false,
-          axisLabel: {
-            formatter: (value: number) => formatPrice(value)
-          }
-        },
-        {
-          scale: true,
-          gridIndex: 1,
-          show: false
-        }
-      ],
-      series: [
-        {
-          name: 'K线',
-          type: 'candlestick',
-          data: data.map(item => [
-            item.open,
-            item.close,
-            item.low,
-            item.high
-          ]),
-          itemStyle: {
-            color: '#26a69a',
-            color0: '#ef5350',
-            borderColor: '#26a69a',
-            borderColor0: '#ef5350'
-          }
-        },
-        {
-          name: '成交量',
-          type: 'bar',
-          xAxisIndex: 1,
-          yAxisIndex: 1,
-          data: data.map(item => [
-            item.time,
-            item.volume
-          ]),
-          itemStyle: {
-            color: (params: ItemStyleParams) => {
-              const item = data[params.dataIndex];
-              return item.close >= item.open ? '#26a69a' : '#ef5350';
-            }
-          }
-        }
-      ]
-    };
-  };
-
-  // 添加事件处理函数的类型
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewSymbol(e.target.value.toUpperCase());
-  };
-
-  const handleModalClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-
+  // 添加错误消失的 useEffect
   useEffect(() => {
     if (error) {
       const timer = setTimeout(() => {
@@ -268,10 +161,93 @@ export default function CryptoPage() {
     }
   }, [error]);
 
+  // 获取 Meme 币数据
+  const fetchMemeTokensData = useCallback(async () => {
+    if (memeSymbols.length === 0) return;
+
+    setIsMemeDataLoading(true);
+    setError(null);
+
+    try {
+      // CoinGecko API 需要小写的符号
+      const symbols = memeSymbols.map(s => s.toLowerCase());
+      const response = await axios.get('https://api.coingecko.com/api/v3/simple/price', {
+        params: {
+          ids: symbols.join(','),
+          vs_currencies: 'usd',
+          include_market_cap: true,
+          include_24hr_vol: true,
+          include_last_updated_at: true
+        }
+      });
+
+      const newData: Record<string, MemeTokenData> = {};
+      
+      // 处理响应数据
+      Object.entries(response.data).forEach(([id, data]: [string, any]) => {
+        const symbol = id.toUpperCase();
+        newData[symbol] = {
+          id,
+          symbol,
+          name: data.name || symbol,
+          market_cap: data.usd_market_cap || 0,
+          current_price: data.usd || 0,
+          total_volume: data.usd_24h_vol || 0,
+          last_updated: new Date(data.last_updated_at * 1000).toISOString()
+        };
+      });
+
+      setMemeTokensData(newData);
+      setMemeLastUpdate(new Date().toLocaleString());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '获取 Meme 币数据失败');
+    } finally {
+      setIsMemeDataLoading(false);
+    }
+  }, [memeSymbols]);
+
+  // 添加初始加载
+  const memeDataInitialLoad = useRef(false);
+
+  useEffect(() => {
+    if (memeSymbols.length > 0 && !memeDataInitialLoad.current) {
+      memeDataInitialLoad.current = true;
+      void fetchMemeTokensData();
+    }
+  }, [memeSymbols, fetchMemeTokensData]);
+
+  // 渲染当前标签页内容
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'mainstream':
+        return (
+          <MainstreamCoins 
+            symbols={mainstreamSymbols}
+            klineData={mainstreamData}
+            loadingStates={mainstreamLoadingStates}
+          />
+        );
+      case 'meme':
+        return (
+          <MemeCoins 
+            symbols={memeSymbols}
+            tokenData={memeTokensData}
+          />
+        );
+      case 'others':
+        return <OtherData />;
+      case 'wallet':
+        return <WalletMonitor />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-emerald-200/70 via-green-300/60 to-teal-400/70 p-3 relative">
-        <div className="absolute top-3 left-3 right-3 flex items-center gap-4">
+      <div className="min-h-screen bg-gradient-to-br from-emerald-200/70 via-green-300/60 to-teal-400/70 p-3">
+        {/* 顶部导航栏 */}
+        <div className="flex items-center gap-4 mb-4">
           <Link 
             href="/"
             className="h-9 px-3 rounded-lg bg-white/90 text-emerald-600 
@@ -283,117 +259,137 @@ export default function CryptoPage() {
             <span className="transform transition-transform duration-300 group-hover:-translate-x-1">←</span>
             <span>返回首页</span>
           </Link>
-
-          <div className="h-9 flex items-center gap-3 px-4 rounded-lg bg-white/90 shadow-lg">
-            <h2 className="text-gray-800 font-medium">加密货币行情</h2>
-            {lastUpdateTime && (
-              <span className="text-sm text-gray-500">
-                更新于: {lastUpdateTime}
-              </span>
-            )}
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="h-7 px-3 bg-emerald-500 text-white text-sm rounded-lg hover:bg-emerald-600 transition-all duration-300"
-            >
-              管理货币
-            </button>
-            <button
-              onClick={fetchKlineData}
-              disabled={isLoading}
-              className="h-7 px-3 bg-emerald-500 text-white text-sm rounded-lg hover:bg-emerald-600 transition-all duration-300 disabled:opacity-50"
-            >
-              {isLoading ? '加载中...' : '刷新数据'}
-            </button>
-          </div>
         </div>
 
-        <div className="mx-[100px] pt-16">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {symbols.map(symbol => (
-              <div key={symbol} className="bg-white/90 rounded-lg p-2 shadow-lg">
-                {loadingStates[symbol] ? (
-                  <div className="text-center py-6 text-gray-500 text-sm">
-                    {symbol} 加载中...
-                  </div>
-                ) : klineData[symbol]?.length > 0 ? (
-                  <>
-                    <div className="mb-1 flex flex-wrap items-center gap-x-3 px-1">
-                      <span className="text-base font-bold text-blue-400">{symbol}</span>
-                      <span className="text-sm text-blue-400 whitespace-nowrap">
-                        Close: {formatPrice(klineData[symbol][klineData[symbol].length - 1].close)}
-                      </span>
-                      <span className="text-sm text-red-500 whitespace-nowrap">
-                        Min: {formatPrice(Math.min(...klineData[symbol].map(d => d.low)))}
-                      </span>
-                      <span className="text-sm text-green-500 whitespace-nowrap">
-                        Max: {formatPrice(Math.max(...klineData[symbol].map(d => d.high)))}
-                      </span>
-                    </div>
-                    <ReactECharts 
-                      option={getChartOption(symbol, klineData[symbol])} 
-                      style={{ height: '220px' }}
-                      className="w-full"
-                    />
-                  </>
-                ) : (
-                  <div className="text-center py-6 text-gray-500 text-sm">
-                    {symbol} 未获取数据
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* 管理货币弹窗 */}
-        {isModalOpen && (
-          <div 
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50"
-            onClick={() => setIsModalOpen(false)}
-          >
-            <div 
-              className="bg-white rounded-xl p-6 w-full max-w-2xl shadow-2xl"
-              onClick={handleModalClick}
-            >
-              <h3 className="text-xl font-medium text-gray-800 mb-4">管理货币表</h3>
-              
-              <div className="flex gap-2 mb-4">
-                <input
-                  type="text"
-                  value={newSymbol}
-                  onChange={handleInputChange}
-                  placeholder="输入货币符号（如 BTC）"
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-                />
+        {/* 主要内容区域 */}
+        <div className="mx-[100px]">
+          {/* 标签切换和操作按钮 */}
+          <div className="mb-4 flex items-center justify-between">
+            <div className="inline-flex bg-white/90 rounded-lg p-1 gap-2">
+              {TABS.map(tab => (
                 <button
-                  onClick={handleAddSymbol}
-                  className="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-all duration-300"
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 ${
+                    activeTab === tab.key
+                      ? 'bg-emerald-500 text-white'
+                      : 'hover:bg-emerald-50 text-gray-600'
+                  }`}
                 >
-                  添加
+                  <span>{tab.icon}</span>
+                  <span>{tab.label}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* 根据当前标签显示对应的操作按钮 */}
+            {activeTab === 'mainstream' && (
+              <div className="flex items-center gap-4">
+                {mainstreamLastUpdate && (
+                  <span className="text-sm text-gray-500">
+                    更新于: {mainstreamLastUpdate}
+                  </span>
+                )}
+                <button
+                  onClick={() => setIsMainstreamModalOpen(true)}
+                  className="h-7 px-3 bg-emerald-500 text-white text-sm rounded-lg hover:bg-emerald-600 transition-all duration-300"
+                >
+                  管理货币
+                </button>
+                <button
+                  onClick={fetchMainstreamData}
+                  disabled={mainstreamLoading}
+                  className="h-7 px-3 bg-emerald-500 text-white text-sm rounded-lg hover:bg-emerald-600 transition-all duration-300 disabled:opacity-50"
+                >
+                  {mainstreamLoading ? '加载中...' : '刷新数据'}
                 </button>
               </div>
+            )}
 
-              <div className="grid grid-cols-2 gap-2">
-                {symbols.map((symbol, index) => (
-                  <div 
-                    key={symbol}
-                    className="flex items-center p-2 bg-gray-50 rounded-lg"
-                  >
-                    <span className="w-8 text-gray-400 select-none">
-                      {index + 1}.
-                    </span>
-                    <span className="flex-1">{symbol}</span>
-                    <button
-                      onClick={() => handleRemoveSymbol(symbol)}
-                      className="text-red-500 hover:text-red-600 ml-2"
-                    >
-                      删除
-                    </button>
-                  </div>
-                ))}
+            {activeTab === 'meme' && (
+              <div className="flex items-center gap-4">
+                {memeLastUpdate && (
+                  <span className="text-sm text-gray-500">
+                    更新于: {memeLastUpdate}
+                  </span>
+                )}
+                <button
+                  onClick={() => setIsMemeModalOpen(true)}
+                  className="h-7 px-3 bg-emerald-500 text-white text-sm rounded-lg hover:bg-emerald-600 transition-all duration-300"
+                >
+                  管理 Meme 币
+                </button>
+                <button
+                  onClick={fetchMemeTokensData}
+                  disabled={isMemeDataLoading}
+                  className="h-7 px-3 bg-emerald-500 text-white text-sm rounded-lg hover:bg-emerald-600 transition-all duration-300 disabled:opacity-50"
+                >
+                  {isMemeDataLoading ? '加载中...' : '刷新数据'}
+                </button>
               </div>
-            </div>
+            )}
           </div>
+
+          {/* 内容区域 */}
+          {renderTabContent()}
+        </div>
+
+        {/* 只保留主流货币的弹窗 */}
+        {isMainstreamModalOpen && (
+          <ManageSymbolsModal
+            title="管理主流货币"
+            symbols={mainstreamSymbols}
+            newSymbol={mainstreamNewSymbol}
+            onClose={() => setIsMainstreamModalOpen(false)}
+            onAdd={async () => {
+              try {
+                await addMainstreamSymbol(mainstreamNewSymbol);
+                setMainstreamNewSymbol('');
+                setIsMainstreamModalOpen(false);
+              } catch (err) {
+                setError(err instanceof Error ? err.message : '添加货币失败');
+              }
+            }}
+            onRemove={async (symbol) => {
+              try {
+                await removeMainstreamSymbol(symbol);
+                setMainstreamData(prev => {
+                  const newData = { ...prev };
+                  delete newData[symbol];
+                  return newData;
+                });
+              } catch (err) {
+                setError(err instanceof Error ? err.message : '删除货币失败');
+              }
+            }}
+            onSymbolChange={(value) => setMainstreamNewSymbol(value.toUpperCase())}
+          />
+        )}
+
+        {/* 添加 Meme 币管理弹窗 */}
+        {isMemeModalOpen && (
+          <ManageSymbolsModal
+            title="管理 Meme 币"
+            symbols={memeSymbols}
+            newSymbol={memeNewSymbol}
+            onClose={() => setIsMemeModalOpen(false)}
+            onAdd={async () => {
+              try {
+                await addMemeSymbol(memeNewSymbol);
+                setMemeNewSymbol('');
+              } catch (err) {
+                setError(err instanceof Error ? err.message : '添加货币失败');
+              }
+            }}
+            onRemove={async (symbol) => {
+              try {
+                await removeMemeSymbol(symbol);
+              } catch (err) {
+                setError(err instanceof Error ? err.message : '删除货币失败');
+              }
+            }}
+            onSymbolChange={(value) => setMemeNewSymbol(value.toUpperCase())}
+          />
         )}
 
         {error && (

@@ -2,15 +2,13 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { supabase } from '../config/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
-export function useCryptoSymbols() {
+export function useCryptoSymbols(type: 'mainstream' | 'meme' = 'mainstream') {
   const [symbols, setSymbols] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const { username } = useAuth();
   const initialFetchDone = useRef(false);
 
   const fetchSymbols = useCallback(async () => {
     if (!username) {
-      setIsLoading(false);
       return;
     }
     
@@ -19,18 +17,25 @@ export function useCryptoSymbols() {
         .from('crypto_symbols')
         .select('symbol')
         .eq('user_id', username)
+        .eq('type', type)
         .order('sort_order', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
 
       setSymbols(data?.map(item => item.symbol) || []);
     } catch (error) {
       console.error('Error fetching symbols:', error);
-      setSymbols([]);
-    } finally {
-      setIsLoading(false);
+      // 不要在这里设置空数组，保持之前的状态
+      if (error instanceof Error) {
+        throw new Error(`获取货币列表失败: ${error.message}`);
+      } else {
+        throw new Error('获取货币列表失败');
+      }
     }
-  }, [username]);
+  }, [username, type]);
 
   const addSymbol = async (symbol: string) => {
     if (!username) {
@@ -48,28 +53,57 @@ export function useCryptoSymbols() {
         .select('symbol')
         .eq('user_id', username)
         .eq('symbol', symbol.toUpperCase())
+        .eq('type', type)
         .maybeSingle();
 
-      if (checkError) throw checkError;
+      if (checkError) {
+        console.error('Check symbol error:', checkError);
+        throw checkError;
+      }
       
       if (existing) {
         throw new Error('该货币已添加');
       }
+
+      // 获取当前最大的 sort_order
+      const { data: maxOrderData, error: maxOrderError } = await supabase
+        .from('crypto_symbols')
+        .select('sort_order')
+        .eq('user_id', username)
+        .eq('type', type)
+        .order('sort_order', { ascending: false })
+        .limit(1);
+
+      if (maxOrderError) {
+        console.error('Get max order error:', maxOrderError);
+        throw maxOrderError;
+      }
+
+      const nextOrder = (maxOrderData?.[0]?.sort_order || 0) + 1;
 
       // 添加新货币
       const { error: insertError } = await supabase
         .from('crypto_symbols')
         .insert({
           user_id: username,
-          symbol: symbol.toUpperCase()
+          symbol: symbol.toUpperCase(),
+          type: type,
+          sort_order: nextOrder
         });
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        console.error('Insert symbol error:', insertError);
+        throw insertError;
+      }
 
       await fetchSymbols();
     } catch (error: any) {
       console.error('Error adding symbol:', error);
-      throw new Error(error.message || '添加失败');
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      } else {
+        throw new Error('添加失败');
+      }
     }
   };
 
@@ -83,18 +117,25 @@ export function useCryptoSymbols() {
         .from('crypto_symbols')
         .delete()
         .eq('user_id', username)
-        .eq('symbol', symbol);
+        .eq('symbol', symbol)
+        .eq('type', type);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Remove symbol error:', error);
+        throw error;
+      }
 
       await fetchSymbols();
     } catch (error: any) {
       console.error('Error removing symbol:', error);
-      throw new Error(error.message || '删除失败');
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      } else {
+        throw new Error('删除失败');
+      }
     }
   };
 
-  // 只在首次加载时获取数据
   useEffect(() => {
     if (username && !initialFetchDone.current) {
       initialFetchDone.current = true;
@@ -104,7 +145,6 @@ export function useCryptoSymbols() {
 
   return {
     symbols,
-    isLoading,
     fetchSymbols,
     addSymbol,
     removeSymbol

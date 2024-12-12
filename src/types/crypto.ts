@@ -13,4 +13,17 @@ export interface CryptoData {
 
 export interface LoadingState {
   [symbol: string]: boolean;
-} 
+}
+
+export interface MemeTokenData {
+  id: string;
+  symbol: string;
+  name: string;
+  market_cap: number;
+  current_price: number;
+  total_volume: number;
+  holders?: number;  // CoinGecko 可能不提供这个数据
+  last_updated: string;
+}
+
+export type MemeTokensData = Record<string, MemeTokenData>; 
