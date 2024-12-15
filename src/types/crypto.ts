@@ -26,4 +26,13 @@ export interface MemeTokenData {
   last_updated: string;
 }
 
-export type MemeTokensData = Record<string, MemeTokenData>; 
+export type MemeTokensData = Record<string, MemeTokenData>;
+
+export interface MemeToken {
+  id?: string;
+  name: string;
+  symbol: string;
+  contract_address: string;
+  user_id?: string;
+  created_at?: string;
+} 

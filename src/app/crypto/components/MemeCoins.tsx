@@ -1,22 +1,22 @@
 'use client';
 
-import type { MemeTokenData } from '@/types/crypto';
+import type { MemeToken, MemeTokenData } from '@/types/crypto';
 
 interface MemeCoinsProps {
-  symbols: string[];
+  tokens: MemeToken[];
   tokenData: Record<string, MemeTokenData>;
 }
 
-export default function MemeCoins({ symbols, tokenData }: MemeCoinsProps) {
+export default function MemeCoins({ tokens, tokenData }: MemeCoinsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {symbols.map(symbol => {
-        const data = tokenData[symbol];
+      {tokens.map(token => {
+        const data = tokenData[token.symbol];
         return (
-          <div key={symbol} className="bg-white/90 rounded-lg p-4 shadow-lg">
+          <div key={token.contract_address} className="bg-white/90 rounded-lg p-4 shadow-lg">
             <div className="flex justify-between items-center mb-3">
-              <h3 className="text-lg font-bold text-blue-500">{symbol}</h3>
-              {data?.name && <span className="text-sm text-gray-500">{data.name}</span>}
+              <h3 className="text-lg font-bold text-blue-500">{token.symbol}</h3>
+              <span className="text-sm text-gray-500">{token.name}</span>
             </div>
             
             {data ? (

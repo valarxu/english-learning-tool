@@ -13,6 +13,8 @@ import OtherData from './components/OtherData';
 import WalletMonitor from './components/WalletMonitor';
 import ManageSymbolsModal from './components/ManageSymbolsModal';
 import type { MemeTokenData } from '@/types/crypto';
+import ManageMemeTokensModal from './components/ManageMemeTokensModal';
+import { useMemeTokens } from '@/hooks/useMemeTokens';
 
 // 移除未使用的 ECharts 相关类型
 const TABS: TabConfig[] = [
@@ -42,46 +44,46 @@ export default function CryptoPage() {
     removeSymbol: removeMainstreamSymbol 
   } = useCryptoSymbols('mainstream');
 
-  // 添加 Meme 币管理相关状态
-  const [isMemeModalOpen, setIsMemeModalOpen] = useState(false);
-  const [memeNewSymbol, setMemeNewSymbol] = useState('');
-
-  // 添加 Meme 币的 hook
+  // 使用 useMemeTokens hook
   const { 
-    symbols: memeSymbols, 
-    addSymbol: addMemeSymbol, 
-    removeSymbol: removeMemeSymbol 
-  } = useCryptoSymbols('meme');
+    tokens: memeTokens,
+    addToken: addMemeToken,
+    removeToken: removeMemeToken
+  } = useMemeTokens();
 
   // 添加 Meme 币数据状态
   const [memeTokensData, setMemeTokensData] = useState<Record<string, MemeTokenData>>({});
   const [isMemeDataLoading, setIsMemeDataLoading] = useState(false);
   const [memeLastUpdate, setMemeLastUpdate] = useState<string>('');
 
+  // 添加 Meme Modal 状态
+  const [isMemeModalOpen, setIsMemeModalOpen] = useState(false);
+
   const MAX_RETRIES = 3;
   const RETRY_DELAY = 30000; // 30秒
 
   const fetchSymbolData = useCallback(async (symbol: string, retryCount = 0): Promise<KLineData[]> => {
     try {
-      // 获取北京时间的今天凌晨
-      const endTime = new Date();
-      // 转换为北京时间
-      endTime.setHours(endTime.getHours() + 8);
-      endTime.setHours(0, 0, 0, 0);
+      // 获取当前 UTC 时间
+      const now = new Date();
       
+      // 设置 UTC 时区的结束时间点为后天凌晨（多预留一天）
+      const endTime = new Date(Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth(),
+        now.getUTCDate() + 2  // 加2天
+      ));
+      
+      // 设置开始时间为 31 天前
       const startTime = new Date(endTime);
-      startTime.setDate(startTime.getDate() - 31);  // 31天前
-
-      // 转换回 UTC 时间戳
-      const endTimeUTC = new Date(endTime.getTime() - 8 * 60 * 60 * 1000);
-      const startTimeUTC = new Date(startTime.getTime() - 8 * 60 * 60 * 1000);
+      startTime.setUTCDate(startTime.getUTCDate() - 31);
 
       const response = await axios.get('https://api.binance.com/api/v3/klines', {
         params: {
           symbol: `${symbol}USDT`,
           interval: '1d',
-          startTime: startTimeUTC.getTime(),
-          endTime: endTimeUTC.getTime() - 1,
+          startTime: startTime.getTime(),
+          endTime: endTime.getTime() - 1,
           limit: 30
         }
       });
@@ -163,14 +165,14 @@ export default function CryptoPage() {
 
   // 获取 Meme 币数据
   const fetchMemeTokensData = useCallback(async () => {
-    if (memeSymbols.length === 0) return;
+    if (memeTokens.length === 0) return;
 
     setIsMemeDataLoading(true);
     setError(null);
 
     try {
       // CoinGecko API 需要小写的符号
-      const symbols = memeSymbols.map(s => s.toLowerCase());
+      const symbols = memeTokens.map(token => token.contract_address.toLowerCase());
       const response = await axios.get('https://api.coingecko.com/api/v3/simple/price', {
         params: {
           ids: symbols.join(','),
@@ -185,16 +187,18 @@ export default function CryptoPage() {
       
       // 处理响应数据
       Object.entries(response.data).forEach(([id, data]: [string, any]) => {
-        const symbol = id.toUpperCase();
-        newData[symbol] = {
-          id,
-          symbol,
-          name: data.name || symbol,
-          market_cap: data.usd_market_cap || 0,
-          current_price: data.usd || 0,
-          total_volume: data.usd_24h_vol || 0,
-          last_updated: new Date(data.last_updated_at * 1000).toISOString()
-        };
+        const token = memeTokens.find(t => t.contract_address.toLowerCase() === id);
+        if (token) {
+          newData[token.symbol] = {
+            id,
+            symbol: token.symbol,
+            name: token.name,
+            market_cap: data.usd_market_cap || 0,
+            current_price: data.usd || 0,
+            total_volume: data.usd_24h_vol || 0,
+            last_updated: new Date(data.last_updated_at * 1000).toISOString()
+          };
+        }
       });
 
       setMemeTokensData(newData);
@@ -204,17 +208,17 @@ export default function CryptoPage() {
     } finally {
       setIsMemeDataLoading(false);
     }
-  }, [memeSymbols]);
+  }, [memeTokens]);
 
   // 添加初始加载
   const memeDataInitialLoad = useRef(false);
 
   useEffect(() => {
-    if (memeSymbols.length > 0 && !memeDataInitialLoad.current) {
+    if (memeTokens.length > 0 && !memeDataInitialLoad.current) {
       memeDataInitialLoad.current = true;
       void fetchMemeTokensData();
     }
-  }, [memeSymbols, fetchMemeTokensData]);
+  }, [memeTokens, fetchMemeTokensData]);
 
   // 渲染当前标签页内容
   const renderTabContent = () => {
@@ -230,7 +234,7 @@ export default function CryptoPage() {
       case 'meme':
         return (
           <MemeCoins 
-            symbols={memeSymbols}
+            tokens={memeTokens}
             tokenData={memeTokensData}
           />
         );
@@ -330,7 +334,7 @@ export default function CryptoPage() {
             )}
           </div>
 
-          {/* 内容区域 */}
+          {/* 容区域 */}
           {renderTabContent()}
         </div>
 
@@ -366,29 +370,13 @@ export default function CryptoPage() {
           />
         )}
 
-        {/* 添加 Meme 币管理弹窗 */}
+        {/* 使用新的 Meme 币管理弹窗 */}
         {isMemeModalOpen && (
-          <ManageSymbolsModal
-            title="管理 Meme 币"
-            symbols={memeSymbols}
-            newSymbol={memeNewSymbol}
+          <ManageMemeTokensModal
+            tokens={memeTokens}
             onClose={() => setIsMemeModalOpen(false)}
-            onAdd={async () => {
-              try {
-                await addMemeSymbol(memeNewSymbol);
-                setMemeNewSymbol('');
-              } catch (err) {
-                setError(err instanceof Error ? err.message : '添加货币失败');
-              }
-            }}
-            onRemove={async (symbol) => {
-              try {
-                await removeMemeSymbol(symbol);
-              } catch (err) {
-                setError(err instanceof Error ? err.message : '删除货币失败');
-              }
-            }}
-            onSymbolChange={(value) => setMemeNewSymbol(value.toUpperCase())}
+            onAdd={addMemeToken}
+            onRemove={removeMemeToken}
           />
         )}
 
