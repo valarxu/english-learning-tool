@@ -116,7 +116,7 @@ export default function ManageMemeTokensModal({
             decimals: parsedData.parsed.info.decimals
           });
         }
-      } catch (_) {
+      } catch {
         // 如果获取元数据失败，使用基本信息
         setSearchResult({
           name: `Token ${contractAddress.slice(0, 6)}...`,
