@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Connection, PublicKey, Commitment } from '@solana/web3.js';
+import Image from 'next/image';
 import type { MemeToken } from '@/types/crypto';
 
 interface TokenInfo {
@@ -115,7 +116,7 @@ export default function ManageMemeTokensModal({
             decimals: parsedData.parsed.info.decimals
           });
         }
-      } catch (metadataErr) {
+      } catch (_) {
         // 如果获取元数据失败，使用基本信息
         setSearchResult({
           name: `Token ${contractAddress.slice(0, 6)}...`,
@@ -193,10 +194,12 @@ export default function ManageMemeTokensModal({
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-3">
                   {searchResult.logoURI && (
-                    <img
-                      src={searchResult.logoURI}
+                    <Image 
+                      src={searchResult.logoURI} 
                       alt={searchResult.name}
-                      className="w-8 h-8 rounded-full"
+                      width={32}
+                      height={32}
+                      className="rounded-full"
                     />
                   )}
                   <div>
@@ -264,7 +267,7 @@ export default function ManageMemeTokensModal({
 }
 
 // 辅助函数：解析元数据
-function decodeMetadata(buffer: Buffer): any {
+function decodeMetadata(_data: Buffer): any {
   // 这里需要实现元数据解析逻辑
   // 可以使用 @metaplex-foundation/mpl-token-metadata 库
   // 或者自己实现解析逻辑
