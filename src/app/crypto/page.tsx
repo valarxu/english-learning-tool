@@ -71,7 +71,7 @@ export default function CryptoPage() {
       const endTime = new Date(Date.UTC(
         now.getUTCFullYear(),
         now.getUTCMonth(),
-        now.getUTCDate() + 2  // 加2天
+        now.getUTCDate() + 1  // 加2天
       ));
       
       // 设置开始时间为 31 天前

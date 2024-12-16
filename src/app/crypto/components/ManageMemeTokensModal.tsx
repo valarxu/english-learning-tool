@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Connection, PublicKey } from '@solana/web3.js';
+import { Connection, PublicKey, Commitment } from '@solana/web3.js';
 import type { MemeToken } from '@/types/crypto';
 
 interface TokenInfo {
@@ -9,21 +9,34 @@ interface TokenInfo {
   symbol: string;
   contract_address: string;
   decimals: number;
-  totalSupply?: string;
+  logoURI?: string;
+  tags?: string[];
 }
 
-interface TokenData {
-  program: string;
+interface TokenAccountData {
   parsed: {
-    type: string;
     info: {
-      name: string;
-      symbol: string;
       decimals: number;
-      supply?: string;
+      freezeAuthority: string | null;
+      isInitialized: boolean;
+      mintAuthority: string | null;
+      supply: string;
     };
+    type: string;
   };
+  program: string;
+  space: number;
 }
+
+// 使用 QuickNode RPC
+const RPC_URL = `https://api.quicknode.com/graphql/${process.env.NEXT_PUBLIC_QUICKNODE_API_KEY}`;
+
+const connectionConfig = {
+  commitment: 'confirmed' as Commitment,
+  httpHeaders: {
+    'x-api-key': process.env.NEXT_PUBLIC_QUICKNODE_API_KEY || '',
+  }
+};
 
 interface ManageMemeTokensModalProps {
   tokens: MemeToken[];
@@ -31,13 +44,6 @@ interface ManageMemeTokensModalProps {
   onAdd: (token: Omit<MemeToken, 'id' | 'user_id' | 'created_at'>) => Promise<void>;
   onRemove: (contractAddress: string) => Promise<void>;
 }
-
-const RPC_ENDPOINTS = [
-  'https://api.mainnet-beta.solana.com',
-  'https://solana-mainnet.g.alchemy.com/v2/demo',
-  'https://rpc.ankr.com/solana',
-  'https://solana-api.projectserum.com'
-];
 
 export default function ManageMemeTokensModal({
   tokens,
@@ -55,57 +61,73 @@ export default function ManageMemeTokensModal({
     
     setIsSearching(true);
     setError(null);
-    
+
     try {
-      // 尝试所有 RPC 节点
-      for (const endpoint of RPC_ENDPOINTS) {
-        try {
-          // 验证地址格式
-          const pubkey = new PublicKey(contractAddress);
-          
-          // 连接到 Solana 节点
-          const connection = new Connection(endpoint);
-          
-          // 获取代币信息
-          const tokenInfo = await connection.getParsedAccountInfo(pubkey);
-          
-          if (!tokenInfo.value || !tokenInfo.value.data) {
-            throw new Error('无效的代币地址');
-          }
+      // 验证地址格式
+      const mintPubkey = new PublicKey(contractAddress);
+      
+      // 使用 QuickNode RPC
+      const connection = new Connection(RPC_URL, connectionConfig);
 
-          // 类型断言
-          const tokenData = tokenInfo.value.data as TokenData;
-          
-          if (!tokenData.parsed || !tokenData.parsed.info) {
-            throw new Error('无效的代币数据格式');
-          }
-
-          // 解析代币信息
-          setSearchResult({
-            name: tokenData.parsed.info.name || 'Unknown',
-            symbol: tokenData.parsed.info.symbol || 'Unknown',
-            contract_address: contractAddress,
-            decimals: tokenData.parsed.info.decimals || 0,
-            totalSupply: tokenData.parsed.info.supply?.toString() || '0'
-          });
-
-          // 成功获取数据后退出循环
-          return;
-        } catch (err) {
-          // 如果是最后一个节点且失败，则抛出错误
-          if (endpoint === RPC_ENDPOINTS[RPC_ENDPOINTS.length - 1]) {
-            console.error('Search error:', err);
-            if (err instanceof Error && err.message.includes('403')) {
-              setError('RPC 节点访问受限，请稍后再试');
-            } else {
-              setError(err instanceof Error ? err.message : '搜索失败');
-            }
-            setSearchResult(null);
-          }
-          // 否则继续尝试下一个节点
-          continue;
-        }
+      // 获取代币账户信息
+      const accountInfo = await connection.getParsedAccountInfo(mintPubkey);
+      
+      if (!accountInfo.value) {
+        throw new Error('无效的代币地址');
       }
+
+      const parsedData = accountInfo.value.data as TokenAccountData;
+      
+      if (!parsedData || !parsedData.parsed || parsedData.program !== 'spl-token') {
+        throw new Error('无效的 SPL 代币');
+      }
+
+      // 获取代币元数据账户
+      const [metadataPubkey] = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from('metadata'),
+          new PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s').toBuffer(),
+          mintPubkey.toBuffer()
+        ],
+        new PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s')
+      );
+
+      try {
+        // 尝试获取元数据
+        const metadataAccount = await connection.getAccountInfo(metadataPubkey);
+        
+        if (metadataAccount && metadataAccount.data) {
+          // 解析元数据
+          const metadata = decodeMetadata(metadataAccount.data);
+          setSearchResult({
+            name: metadata.data.name,
+            symbol: metadata.data.symbol,
+            contract_address: contractAddress,
+            decimals: parsedData.parsed.info.decimals,
+            logoURI: metadata.data.uri
+          });
+        } else {
+          // 如果没有元数据，使用基本信息
+          setSearchResult({
+            name: `Token ${contractAddress.slice(0, 6)}...`,
+            symbol: `TOKEN`,
+            contract_address: contractAddress,
+            decimals: parsedData.parsed.info.decimals
+          });
+        }
+      } catch (metadataErr) {
+        // 如果获取元数据失败，使用基本信息
+        setSearchResult({
+          name: `Token ${contractAddress.slice(0, 6)}...`,
+          symbol: `TOKEN`,
+          contract_address: contractAddress,
+          decimals: parsedData.parsed.info.decimals
+        });
+      }
+    } catch (err) {
+      console.error('Search error:', err);
+      setError(err instanceof Error ? err.message : '搜索失败');
+      setSearchResult(null);
     } finally {
       setIsSearching(false);
     }
@@ -128,16 +150,16 @@ export default function ManageMemeTokensModal({
   };
 
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50"
       onClick={onClose}
     >
-      <div 
+      <div
         className="bg-white rounded-xl p-6 w-full max-w-2xl shadow-2xl"
         onClick={e => e.stopPropagation()}
       >
         <h3 className="text-xl font-medium text-gray-800 mb-4">管理 Meme 币</h3>
-        
+
         <div className="space-y-4">
           {/* 搜索区域 */}
           <div className="flex gap-2">
@@ -169,10 +191,31 @@ export default function ManageMemeTokensModal({
           {searchResult && (
             <div className="bg-gray-50 p-4 rounded-lg">
               <div className="flex justify-between items-start">
-                <div>
-                  <h4 className="font-medium text-lg">{searchResult.name}</h4>
-                  <p className="text-gray-500">{searchResult.symbol}</p>
-                  <p className="text-xs text-gray-400 mt-1 break-all">{searchResult.contract_address}</p>
+                <div className="flex items-center gap-3">
+                  {searchResult.logoURI && (
+                    <img
+                      src={searchResult.logoURI}
+                      alt={searchResult.name}
+                      className="w-8 h-8 rounded-full"
+                    />
+                  )}
+                  <div>
+                    <h4 className="font-medium text-lg">{searchResult.name}</h4>
+                    <p className="text-gray-500">{searchResult.symbol}</p>
+                    <p className="text-xs text-gray-400 mt-1 break-all">{searchResult.contract_address}</p>
+                    {searchResult.tags && searchResult.tags.length > 0 && (
+                      <div className="flex gap-2 mt-2">
+                        {searchResult.tags.map(tag => (
+                          <span
+                            key={tag}
+                            className="px-2 py-0.5 bg-emerald-100 text-emerald-600 rounded-full text-xs"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <button
                   onClick={handleAdd}
@@ -180,19 +223,6 @@ export default function ManageMemeTokensModal({
                 >
                   添加
                 </button>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 mt-4">
-                <div className="bg-white p-3 rounded-lg">
-                  <p className="text-sm text-gray-500">精度</p>
-                  <p className="font-medium">{searchResult.decimals}</p>
-                </div>
-                {searchResult.totalSupply && (
-                  <div className="bg-white p-3 rounded-lg">
-                    <p className="text-sm text-gray-500">总供应量</p>
-                    <p className="font-medium">{searchResult.totalSupply}</p>
-                  </div>
-                )}
               </div>
             </div>
           )}
@@ -208,7 +238,7 @@ export default function ManageMemeTokensModal({
             <h4 className="text-lg font-medium text-gray-700 mb-3">已添加的代币</h4>
             <div className="space-y-2">
               {tokens.map((token) => (
-                <div 
+                <div
                   key={token.contract_address}
                   className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                 >
@@ -231,4 +261,18 @@ export default function ManageMemeTokensModal({
       </div>
     </div>
   );
+}
+
+// 辅助函数：解析元数据
+function decodeMetadata(buffer: Buffer): any {
+  // 这里需要实现元数据解析逻辑
+  // 可以使用 @metaplex-foundation/mpl-token-metadata 库
+  // 或者自己实现解析逻辑
+  return {
+    data: {
+      name: 'Unknown',
+      symbol: 'UNKNOWN',
+      uri: ''
+    }
+  };
 } 
