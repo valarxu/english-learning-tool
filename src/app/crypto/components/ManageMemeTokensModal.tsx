@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Connection, PublicKey, Commitment } from '@solana/web3.js';
 import Image from 'next/image';
 import type { MemeToken } from '@/types/crypto';
+import axios from 'axios';
 
 interface TokenInfo {
   name: string;
@@ -12,32 +12,9 @@ interface TokenInfo {
   decimals: number;
   logoURI?: string;
   tags?: string[];
+  volume24h?: string;
+  marketCap?: string;
 }
-
-interface TokenAccountData {
-  parsed: {
-    info: {
-      decimals: number;
-      freezeAuthority: string | null;
-      isInitialized: boolean;
-      mintAuthority: string | null;
-      supply: string;
-    };
-    type: string;
-  };
-  program: string;
-  space: number;
-}
-
-// 使用 QuickNode RPC
-const RPC_URL = `https://api.quicknode.com/graphql/${process.env.NEXT_PUBLIC_QUICKNODE_API_KEY}`;
-
-const connectionConfig = {
-  commitment: 'confirmed' as Commitment,
-  httpHeaders: {
-    'x-api-key': process.env.NEXT_PUBLIC_QUICKNODE_API_KEY || '',
-  }
-};
 
 interface ManageMemeTokensModalProps {
   tokens: MemeToken[];
@@ -64,70 +41,42 @@ export default function ManageMemeTokensModal({
     setError(null);
 
     try {
-      // 验证地址格式
-      const mintPubkey = new PublicKey(contractAddress);
-      
-      // 使用 QuickNode RPC
-      const connection = new Connection(RPC_URL, connectionConfig);
-
-      // 获取代币账户信息
-      const accountInfo = await connection.getParsedAccountInfo(mintPubkey);
-      
-      if (!accountInfo.value) {
-        throw new Error('无效的代币地址');
-      }
-
-      const parsedData = accountInfo.value.data as TokenAccountData;
-      
-      if (!parsedData || !parsedData.parsed || parsedData.program !== 'spl-token') {
-        throw new Error('无效的 SPL 代币');
-      }
-
-      // 获取代币元数据账户
-      const [metadataPubkey] = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from('metadata'),
-          new PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s').toBuffer(),
-          mintPubkey.toBuffer()
-        ],
-        new PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s')
-      );
-
-      try {
-        // 尝试获取元数据
-        const metadataAccount = await connection.getAccountInfo(metadataPubkey);
-        
-        if (metadataAccount && metadataAccount.data) {
-          // 解析元数据
-          const metadata = decodeMetadata(metadataAccount.data);
-          setSearchResult({
-            name: metadata.data.name,
-            symbol: metadata.data.symbol,
-            contract_address: contractAddress,
-            decimals: parsedData.parsed.info.decimals,
-            logoURI: metadata.data.uri
-          });
-        } else {
-          // 如果没有元数据，使用基本信息
-          setSearchResult({
-            name: `Token ${contractAddress.slice(0, 6)}...`,
-            symbol: `TOKEN`,
-            contract_address: contractAddress,
-            decimals: parsedData.parsed.info.decimals
-          });
+      // 使用本地 API 路由
+      const response = await axios.get('/api/okx/token', {
+        params: {
+          tokenAddress: contractAddress
         }
-      } catch {
-        // 如果获取元数据失败，使用基本信息
-        setSearchResult({
-          name: `Token ${contractAddress.slice(0, 6)}...`,
-          symbol: `TOKEN`,
-          contract_address: contractAddress,
-          decimals: parsedData.parsed.info.decimals
-        });
+      });
+
+      if (!response.data?.data?.[0]) {
+        throw new Error('未找到代币信息');
       }
+
+      const tokenInfo = response.data.data[0];
+      console.log('Token info from API:', tokenInfo);
+
+      // 确保必要字段有值
+      if (!tokenInfo.name && !tokenInfo.symbol) {
+        throw new Error('代币信息不完整');
+      }
+
+      setSearchResult({
+        name: tokenInfo.name || 'Unknown Token',
+        symbol: tokenInfo.symbol || 'UNKNOWN',
+        contract_address: contractAddress,
+        decimals: parseInt(tokenInfo.tokenDecimal || '0'),
+        logoURI: tokenInfo.logoUrl || '',
+        tags: tokenInfo.verified ? ['已验证'] : undefined
+      });
+
     } catch (err) {
       console.error('Search error:', err);
-      setError(err instanceof Error ? err.message : '搜索失败');
+      if (axios.isAxiosError(err)) {
+        const errorMsg = err.response?.data?.msg || err.message;
+        setError(`搜索失败: ${errorMsg}`);
+      } else {
+        setError(err instanceof Error ? err.message : '搜索失败');
+      }
       setSearchResult(null);
     } finally {
       setIsSearching(false);
@@ -138,11 +87,18 @@ export default function ManageMemeTokensModal({
     if (!searchResult) return;
     
     try {
-      await onAdd({
-        name: searchResult.name,
-        symbol: searchResult.symbol,
-        contract_address: searchResult.contract_address
-      });
+      // 确保所有必要字段都有值
+      const tokenData = {
+        name: searchResult.name || 'Unknown Token',
+        symbol: searchResult.symbol || 'UNKNOWN',
+        contract_address: searchResult.contract_address,
+        logoUrl: searchResult.logoURI || '',
+        volume24h: searchResult.volume24h || '',
+        marketCap: searchResult.marketCap || ''
+      };
+
+      console.log('Adding token with data:', tokenData);
+      await onAdd(tokenData);
       setContractAddress('');
       setSearchResult(null);
     } catch (err) {
@@ -156,25 +112,25 @@ export default function ManageMemeTokensModal({
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-xl p-6 w-full max-w-2xl shadow-2xl"
+        className="bg-white rounded-xl p-6 w-full max-w-4xl max-h-[80vh] flex flex-col shadow-2xl"
         onClick={e => e.stopPropagation()}
       >
         <h3 className="text-xl font-medium text-gray-800 mb-4">管理 Meme 币</h3>
 
-        <div className="space-y-4">
-          {/* 搜索区域 */}
-          <div className="flex gap-2">
+        <div className="space-y-4 flex-1 overflow-hidden flex flex-col">
+          {/* 搜索区域 - 固定在顶部 */}
+          <div className="flex gap-2 sticky top-0 bg-white py-2">
             <input
               type="text"
               value={contractAddress}
               onChange={(e) => setContractAddress(e.target.value)}
-              placeholder="输入代币合约地址"
+              placeholder={`输入 SOL 代币合约地址`}
               className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
             <button
               onClick={handleSearch}
               disabled={isSearching || !contractAddress}
-              className="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-all duration-300 disabled:opacity-50"
+              className="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-all duration-300 disabled:opacity-50 whitespace-nowrap"
             >
               {isSearching ? (
                 <span className="flex items-center gap-2">
@@ -194,18 +150,22 @@ export default function ManageMemeTokensModal({
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-3">
                   {searchResult.logoURI && (
-                    <Image 
-                      src={searchResult.logoURI} 
-                      alt={searchResult.name}
-                      width={32}
-                      height={32}
-                      className="rounded-full"
-                    />
+                    <div className="relative w-8 h-8">
+                      <Image 
+                        src={searchResult.logoURI} 
+                        alt={`${searchResult.name} (${searchResult.symbol}) 代币图标`}
+                        width={32}
+                        height={32}
+                        className="rounded-full"
+                      />
+                    </div>
                   )}
                   <div>
                     <h4 className="font-medium text-lg">{searchResult.name}</h4>
                     <p className="text-gray-500">{searchResult.symbol}</p>
-                    <p className="text-xs text-gray-400 mt-1 break-all">{searchResult.contract_address}</p>
+                    <p className="text-xs text-gray-400 mt-1 break-all">
+                      {searchResult.contract_address}
+                    </p>
                     {searchResult.tags && searchResult.tags.length > 0 && (
                       <div className="flex gap-2 mt-2">
                         {searchResult.tags.map(tag => (
@@ -236,23 +196,27 @@ export default function ManageMemeTokensModal({
             </div>
           )}
 
-          {/* 已添加的代币列表 */}
-          <div className="mt-6">
-            <h4 className="text-lg font-medium text-gray-700 mb-3">已添加的代币</h4>
-            <div className="space-y-2">
+          {/* 已添加的代币列表 - 可滚动区域 */}
+          <div className="flex-1 overflow-auto min-h-0">
+            <h4 className="text-lg font-medium text-gray-700 mb-3 sticky top-0 bg-white py-2">
+              已添加的代币
+            </h4>
+            <div className="grid grid-cols-2 gap-4">
               {tokens.map((token) => (
                 <div
                   key={token.contract_address}
                   className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                 >
-                  <div>
-                    <p className="font-medium">{token.name}</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium truncate">{token.name}</p>
                     <p className="text-sm text-gray-500">{token.symbol}</p>
-                    <p className="text-xs text-gray-400 mt-1 break-all">{token.contract_address}</p>
+                    <p className="text-xs text-gray-400 mt-1 break-all">
+                      {token.contract_address}
+                    </p>
                   </div>
                   <button
                     onClick={() => onRemove(token.contract_address)}
-                    className="text-red-500 hover:text-red-600"
+                    className="text-red-500 hover:text-red-600 ml-2 shrink-0"
                   >
                     删除
                   </button>
@@ -264,18 +228,4 @@ export default function ManageMemeTokensModal({
       </div>
     </div>
   );
-}
-
-// 辅助函数：解析元数据
-function decodeMetadata(_data: Buffer): any {
-  // 这里需要实现元数据解析逻辑
-  // 可以使用 @metaplex-foundation/mpl-token-metadata 库
-  // 或者自己实现解析逻辑
-  return {
-    data: {
-      name: 'Unknown',
-      symbol: 'UNKNOWN',
-      uri: ''
-    }
-  };
 } 

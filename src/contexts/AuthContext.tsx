@@ -83,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       localStorage.setItem('auth', JSON.stringify(authData));
       setIsAuthenticated(true);
-      setUsername(user.id);
+      setUsername(user.username);
       router.replace('/');
       
       return true;

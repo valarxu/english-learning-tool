@@ -12,9 +12,9 @@ import MemeCoins from './components/MemeCoins';
 import OtherData from './components/OtherData';
 import WalletMonitor from './components/WalletMonitor';
 import ManageSymbolsModal from './components/ManageSymbolsModal';
-import type { MemeTokenData } from '@/types/crypto';
 import ManageMemeTokensModal from './components/ManageMemeTokensModal';
 import { useMemeTokens } from '@/hooks/useMemeTokens';
+import { supabase } from '@/config/supabase';
 
 // 移除未使用的 ECharts 相关类型
 const TABS: TabConfig[] = [
@@ -47,16 +47,14 @@ export default function CryptoPage() {
   // 使用 useMemeTokens hook
   const { 
     tokens: memeTokens,
+    fetchTokens,
     addToken: addMemeToken,
     removeToken: removeMemeToken
   } = useMemeTokens();
 
-  // 添加 Meme 币数据状态
-  const [memeTokensData, setMemeTokensData] = useState<Record<string, MemeTokenData>>({});
+  // Meme 币状态
   const [isMemeDataLoading, setIsMemeDataLoading] = useState(false);
   const [memeLastUpdate, setMemeLastUpdate] = useState<string>('');
-
-  // 添加 Meme Modal 状态
   const [isMemeModalOpen, setIsMemeModalOpen] = useState(false);
 
   const MAX_RETRIES = 3;
@@ -163,7 +161,7 @@ export default function CryptoPage() {
     }
   }, [error]);
 
-  // 获取 Meme 币数据
+  // 修改 fetchMemeTokensData 函数，只在手动刷新时调用
   const fetchMemeTokensData = useCallback(async () => {
     if (memeTokens.length === 0) return;
 
@@ -171,54 +169,60 @@ export default function CryptoPage() {
     setError(null);
 
     try {
-      // CoinGecko API 需要小写的符号
-      const symbols = memeTokens.map(token => token.contract_address.toLowerCase());
-      const response = await axios.get('https://api.coingecko.com/api/v3/simple/price', {
-        params: {
-          ids: symbols.join(','),
-          vs_currencies: 'usd',
-          include_market_cap: true,
-          include_24hr_vol: true,
-          include_last_updated_at: true
-        }
-      });
+      // 遍历所有代币获取最新数据
+      for (const token of memeTokens) {
+        // 使用本地 API 路由
+        const response = await axios.get('/api/okx/token', {
+          params: {
+            tokenAddress: token.contract_address
+          }
+        });
 
-      const newData: Record<string, MemeTokenData> = {};
-      
-      // 处理响应数据
-      Object.entries(response.data).forEach(([id, data]: [string, any]) => {
-        const token = memeTokens.find(t => t.contract_address.toLowerCase() === id);
-        if (token) {
-          newData[token.symbol] = {
-            id,
-            symbol: token.symbol,
-            name: token.name,
-            market_cap: data.usd_market_cap || 0,
-            current_price: data.usd || 0,
-            total_volume: data.usd_24h_vol || 0,
-            last_updated: new Date(data.last_updated_at * 1000).toISOString()
-          };
+        if (response.data?.data?.[0]) {
+          const tokenInfo = response.data.data[0];
+          // 更新数据库
+          await supabase
+            .from('meme_tokens')
+            .update({
+              volume24h: tokenInfo.volume24h || '',
+              marketCap: tokenInfo.marketCap || '',
+              updated_at: new Date().toISOString()
+            })
+            .eq('contract_address', token.contract_address);
         }
-      });
+      }
 
-      setMemeTokensData(newData);
+      // 重新获取代币列表
+      await fetchTokens();
       setMemeLastUpdate(new Date().toLocaleString());
     } catch (err) {
+      console.error('Error fetching meme tokens:', err);
       setError(err instanceof Error ? err.message : '获取 Meme 币数据失败');
     } finally {
       setIsMemeDataLoading(false);
     }
-  }, [memeTokens]);
+  }, [memeTokens, fetchTokens]);
 
-  // 添加初始加载
-  const memeDataInitialLoad = useRef(false);
+  // 添加复制地址功能
+  const handleCopyAddress = useCallback((address: string) => {
+    navigator.clipboard.writeText(address)
+      .then(() => {
+        // 可以添加一个提示
+        console.log('地址已复制');
+      })
+      .catch(err => {
+        console.error('复制失败:', err);
+      });
+  }, []);
 
-  useEffect(() => {
-    if (memeTokens.length > 0 && !memeDataInitialLoad.current) {
-      memeDataInitialLoad.current = true;
-      void fetchMemeTokensData();
+  // 处理标签切换
+  const handleTabChange = (tab: CryptoTab) => {
+    setActiveTab(tab);
+    // 切换到 Meme 标签时只获取列表，不刷新数据
+    if (tab === 'meme') {
+      void fetchTokens();
     }
-  }, [memeTokens, fetchMemeTokensData]);
+  };
 
   // 渲染当前标签页内容
   const renderTabContent = () => {
@@ -235,7 +239,7 @@ export default function CryptoPage() {
         return (
           <MemeCoins 
             tokens={memeTokens}
-            tokenData={memeTokensData}
+            onCopyAddress={handleCopyAddress}
           />
         );
       case 'others':
@@ -273,7 +277,7 @@ export default function CryptoPage() {
               {TABS.map(tab => (
                 <button
                   key={tab.key}
-                  onClick={() => setActiveTab(tab.key)}
+                  onClick={() => handleTabChange(tab.key)}
                   className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 ${
                     activeTab === tab.key
                       ? 'bg-emerald-500 text-white'

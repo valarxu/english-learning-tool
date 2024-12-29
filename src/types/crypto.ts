@@ -35,4 +35,7 @@ export interface MemeToken {
   contract_address: string;
   user_id?: string;
   created_at?: string;
+  logoUrl?: string;
+  volume24h?: string;
+  marketCap?: string;
 } 
