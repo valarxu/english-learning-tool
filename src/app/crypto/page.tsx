@@ -15,6 +15,7 @@ import ManageSymbolsModal from './components/ManageSymbolsModal';
 import ManageMemeTokensModal from './components/ManageMemeTokensModal';
 import { useMemeTokens } from '@/hooks/useMemeTokens';
 import { supabase } from '@/config/supabase';
+import { fetchOKXToken } from '@/utils/api';
 
 // 移除未使用的 ECharts 相关类型
 const TABS: TabConfig[] = [
@@ -169,18 +170,11 @@ export default function CryptoPage() {
     setError(null);
 
     try {
-      // 遍历所有代币获取最新数据
       for (const token of memeTokens) {
-        // 使用本地 API 路由
-        const response = await axios.get('/api/okx/token', {
-          params: {
-            tokenAddress: token.contract_address
-          }
-        });
+        const response = await fetchOKXToken(token.contract_address);
 
         if (response.data?.data?.[0]) {
           const tokenInfo = response.data.data[0];
-          // 更新数据库
           await supabase
             .from('meme_tokens')
             .update({
@@ -192,7 +186,6 @@ export default function CryptoPage() {
         }
       }
 
-      // 重新获取代币列表
       await fetchTokens();
       setMemeLastUpdate(new Date().toLocaleString());
     } catch (err) {

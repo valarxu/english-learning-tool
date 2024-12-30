@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import type { MemeToken } from '@/types/crypto';
+import { fetchOKXToken } from '@/utils/api';
 import axios from 'axios';
 
 interface TokenInfo {
@@ -41,12 +42,7 @@ export default function ManageMemeTokensModal({
     setError(null);
 
     try {
-      // 使用本地 API 路由
-      const response = await axios.get('/api/okx/token', {
-        params: {
-          tokenAddress: contractAddress
-        }
-      });
+      const response = await fetchOKXToken(contractAddress);
 
       if (!response.data?.data?.[0]) {
         throw new Error('未找到代币信息');
@@ -71,11 +67,11 @@ export default function ManageMemeTokensModal({
 
     } catch (err) {
       console.error('Search error:', err);
-      if (axios.isAxiosError(err)) {
-        const errorMsg = err.response?.data?.msg || err.message;
+      if (axios.isAxiosError(err as any)) {
+        const errorMsg = (err as any).response?.data?.msg || (err as any).message;
         setError(`搜索失败: ${errorMsg}`);
       } else {
-        setError(err instanceof Error ? err.message : '搜索失败');
+        setError((err as Error).message || '搜索失败');
       }
       setSearchResult(null);
     } finally {
