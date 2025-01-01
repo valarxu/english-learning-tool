@@ -5,7 +5,12 @@ import Link from 'next/link';
 import axios from 'axios';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useCryptoSymbols } from '@/hooks/useCryptoSymbols';
-import type { KLineData, CryptoData, LoadingState } from '@/types/crypto';
+import type {
+  KLineData,
+  CryptoData,
+  LoadingState,
+  MarketMetrics
+} from '@/types/crypto';
 import type { CryptoTab, TabConfig } from '@/types/crypto-tabs';
 import MainstreamCoins from './components/MainstreamCoins';
 import MemeCoins from './components/MemeCoins';
@@ -15,7 +20,7 @@ import ManageSymbolsModal from './components/ManageSymbolsModal';
 import ManageMemeTokensModal from './components/ManageMemeTokensModal';
 import { useMemeTokens } from '@/hooks/useMemeTokens';
 import { supabase } from '@/config/supabase';
-import { fetchOKXToken } from '@/utils/api';
+import { fetchOKXToken, fetchFearGreedIndex, fetchMarketDominance, fetchGlobalMetrics, fetchProtocolsTVL, fetchChainsTVL, fetchStablecoinsSupply, fetchYields, fetchVolumes, fetchFees } from '@/utils/api';
 
 // 移除未使用的 ECharts 相关类型
 const TABS: TabConfig[] = [
@@ -27,26 +32,26 @@ const TABS: TabConfig[] = [
 
 export default function CryptoPage() {
   const [activeTab, setActiveTab] = useState<CryptoTab>('mainstream');
-  
+
   // 主流货币状态
   const [mainstreamData, setMainstreamData] = useState<CryptoData>({});
   const [mainstreamLoading, setMainstreamLoading] = useState(false);
   const [mainstreamLoadingStates, setMainstreamLoadingStates] = useState<LoadingState>({});
   const [mainstreamLastUpdate, setMainstreamLastUpdate] = useState<string>('');
   const [mainstreamNewSymbol, setMainstreamNewSymbol] = useState('');
-  
+
   // 通用状态
   const [error, setError] = useState<string | null>(null);
   const [isMainstreamModalOpen, setIsMainstreamModalOpen] = useState(false);
 
-  const { 
-    symbols: mainstreamSymbols, 
-    addSymbol: addMainstreamSymbol, 
-    removeSymbol: removeMainstreamSymbol 
+  const {
+    symbols: mainstreamSymbols,
+    addSymbol: addMainstreamSymbol,
+    removeSymbol: removeMainstreamSymbol
   } = useCryptoSymbols('mainstream');
 
   // 使用 useMemeTokens hook
-  const { 
+  const {
     tokens: memeTokens,
     fetchTokens,
     addToken: addMemeToken,
@@ -58,6 +63,19 @@ export default function CryptoPage() {
   const [memeLastUpdate, setMemeLastUpdate] = useState<string>('');
   const [isMemeModalOpen, setIsMemeModalOpen] = useState(false);
 
+  // 添加其他数据相关的状态
+  const [otherDataLoading, setOtherDataLoading] = useState(false);
+  const [otherDataLastUpdate, setOtherDataLastUpdate] = useState<string>('');
+
+  // 修改状态定义，移除 null 类型
+  const [marketMetrics, setMarketMetrics] = useState<MarketMetrics>({
+    fearGreedIndex: undefined,
+    marketDominance: undefined,
+    globalMetrics: undefined,
+    liquidations: undefined,
+    etfFlows: undefined
+  });
+
   const MAX_RETRIES = 3;
   const RETRY_DELAY = 30000; // 30秒
 
@@ -65,14 +83,14 @@ export default function CryptoPage() {
     try {
       // 获取当前 UTC 时间
       const now = new Date();
-      
+
       // 设置 UTC 时区的结束时间点为后天凌晨（多预留一天）
       const endTime = new Date(Date.UTC(
         now.getUTCFullYear(),
         now.getUTCMonth(),
         now.getUTCDate() + 1  // 加2天
       ));
-      
+
       // 设置开始时间为 31 天前
       const startTime = new Date(endTime);
       startTime.setUTCDate(startTime.getUTCDate() - 31);
@@ -112,10 +130,10 @@ export default function CryptoPage() {
   // 主流货币相关函数
   const fetchMainstreamData = useCallback(async () => {
     if (mainstreamSymbols.length === 0) return;
-    
+
     setMainstreamLoading(true);
     setError(null);
-    
+
     const initialLoadingStates: LoadingState = {};
     mainstreamSymbols.forEach(symbol => {
       initialLoadingStates[symbol] = true;
@@ -217,12 +235,135 @@ export default function CryptoPage() {
     }
   };
 
+  // 分别定义各个数据的获取方法
+  const fetchFearGreed = async () => {
+    try {
+      const data = await fetchFearGreedIndex();
+      setMarketMetrics(prev => ({ ...prev, fearGreedIndex: data }));
+    } catch (err) {
+      console.error('Error fetching fear & greed index:', err);
+      throw err;
+    }
+  };
+
+  const fetchDominance = async () => {
+    try {
+      const data = await fetchMarketDominance();
+      setMarketMetrics(prev => ({ ...prev, marketDominance: data }));
+    } catch (err) {
+      console.error('Error fetching market dominance:', err);
+      throw err;
+    }
+  };
+
+  const fetchGlobal = async () => {
+    try {
+      const data = await fetchGlobalMetrics();
+      setMarketMetrics(prev => ({ ...prev, globalMetrics: data }));
+    } catch (err) {
+      console.error('Error fetching global metrics:', err);
+      throw err;
+    }
+  };
+
+  const fetchDefiProtocols = async () => {
+    try {
+      const data = await fetchProtocolsTVL();
+      setMarketMetrics(prev => ({ ...prev, defiProtocols: data }));
+    } catch (err) {
+      console.error('Error fetching DeFi protocols:', err);
+      throw err;
+    }
+  };
+
+  const fetchDefiChains = async () => {
+    try {
+      const data = await fetchChainsTVL();
+      setMarketMetrics(prev => ({ ...prev, defiChains: data }));
+    } catch (err) {
+      console.error('Error fetching DeFi chains:', err);
+      throw err;
+    }
+  };
+
+  const fetchStablecoinsData = async () => {
+    try {
+      const { stablecoins, chainStables, lastUpdate } = await fetchStablecoinsSupply();
+      setMarketMetrics(prev => ({ ...prev, stablecoins: {
+        stablecoins,
+        lastUpdate
+      }, chainStables: {
+        chainStables,
+        lastUpdate
+      } }));
+    } catch (err) {
+      console.error('Error fetching stablecoins:', err);
+      throw err;
+    }
+  };
+
+  const fetchYieldsData = async () => {
+    try {
+      const data = await fetchYields();
+      setMarketMetrics(prev => ({ ...prev, yields: data }));
+    } catch (err) {
+      console.error('Error fetching yields:', err);
+      throw err;
+    }
+  };
+
+  const fetchVolumesData = async () => {
+    try {
+      const data = await fetchVolumes();
+      setMarketMetrics(prev => ({ ...prev, volumes: data }));
+    } catch (err) {
+      console.error('Error fetching volumes:', err);
+      throw err;
+    }
+  };
+
+  const fetchFeesData = async () => {
+    try {
+      const data = await fetchFees();
+      setMarketMetrics(prev => ({ ...prev, fees: data }));
+    } catch (err) {
+      console.error('Error fetching fees:', err);
+      throw err;
+    }
+  };
+
+  // 修改统一的刷新方法
+  const handleOtherDataRefresh = async () => {
+    setOtherDataLoading(true);
+    setError(null);
+
+    try {
+      await Promise.all([
+        fetchFearGreed(),
+        fetchDominance(),
+        fetchGlobal(),
+        fetchDefiProtocols(),
+        fetchDefiChains(),
+        fetchStablecoinsData(),
+        fetchYieldsData(),
+        fetchVolumesData(),
+        fetchFeesData()
+      ]);
+      
+      setOtherDataLastUpdate(new Date().toLocaleString());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '获取数据失败');
+    } finally {
+      setOtherDataLoading(false);
+    }
+  };
+
   // 渲染当前标签页内容
   const renderTabContent = () => {
     switch (activeTab) {
       case 'mainstream':
         return (
-          <MainstreamCoins 
+          <MainstreamCoins
             symbols={mainstreamSymbols}
             klineData={mainstreamData}
             loadingStates={mainstreamLoadingStates}
@@ -230,13 +371,17 @@ export default function CryptoPage() {
         );
       case 'meme':
         return (
-          <MemeCoins 
+          <MemeCoins
             tokens={memeTokens}
             onCopyAddress={handleCopyAddress}
           />
         );
       case 'others':
-        return <OtherData />;
+        return (
+          <OtherData
+            metrics={marketMetrics}
+          />
+        );
       case 'wallet':
         return <WalletMonitor />;
       default:
@@ -244,12 +389,18 @@ export default function CryptoPage() {
     }
   };
 
+  useEffect(() => {
+    // 添加日志来检查数据
+    console.log('Mainstream symbols:', mainstreamSymbols);
+    console.log('Meme tokens:', memeTokens);
+  }, [mainstreamSymbols, memeTokens]);
+
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gradient-to-br from-emerald-200/70 via-green-300/60 to-teal-400/70 p-3">
         {/* 顶部导航栏 */}
         <div className="flex items-center gap-4 mb-4">
-          <Link 
+          <Link
             href="/"
             className="h-9 px-3 rounded-lg bg-white/90 text-emerald-600 
               transition-all duration-300 backdrop-blur-md font-medium
@@ -271,11 +422,10 @@ export default function CryptoPage() {
                 <button
                   key={tab.key}
                   onClick={() => handleTabChange(tab.key)}
-                  className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 ${
-                    activeTab === tab.key
+                  className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 ${activeTab === tab.key
                       ? 'bg-emerald-500 text-white'
                       : 'hover:bg-emerald-50 text-gray-600'
-                  }`}
+                    }`}
                 >
                   <span>{tab.icon}</span>
                   <span>{tab.label}</span>
@@ -326,6 +476,24 @@ export default function CryptoPage() {
                   className="h-7 px-3 bg-emerald-500 text-white text-sm rounded-lg hover:bg-emerald-600 transition-all duration-300 disabled:opacity-50"
                 >
                   {isMemeDataLoading ? '加载中...' : '刷新数据'}
+                </button>
+              </div>
+            )}
+
+            {activeTab === 'others' && (
+              <div className="flex items-center gap-4">
+                {otherDataLastUpdate && (
+                  <span className="text-sm text-gray-500">
+                    更新于: {otherDataLastUpdate}
+                  </span>
+                )}
+                <button
+                  onClick={handleOtherDataRefresh}
+                  disabled={otherDataLoading}
+                  className="h-7 px-3 bg-emerald-500 text-white text-sm rounded-lg 
+                    hover:bg-emerald-600 transition-all duration-300 disabled:opacity-50"
+                >
+                  {otherDataLoading ? '加载中...' : '刷新数据'}
                 </button>
               </div>
             )}
