@@ -1,5 +1,6 @@
 import axios from 'axios';
 import CryptoJS from 'crypto-js';
+import type { MarketMetrics } from '@/types/crypto';
 
 export async function fetchOKXToken(tokenAddress: string) {
   const isDevelopment = process.env.NODE_ENV === 'development';
@@ -232,4 +233,47 @@ export async function fetchFees() {
     protocols,
     lastUpdate: new Date().toISOString()
   };
+}
+
+// 确保这个函数被导出
+export async function fetchMetricsFromAPI(): Promise<MarketMetrics> {
+  try {
+    const [
+      fearGreedData,
+      dominanceData,
+      globalData,
+      protocolsData,
+      chainsData,
+      stablecoinsData,
+      yieldsData,
+      volumesData,
+      feesData
+    ] = await Promise.all([
+      fetchFearGreedIndex(),
+      fetchMarketDominance(),
+      fetchGlobalMetrics(),
+      fetchProtocolsTVL(),
+      fetchChainsTVL(),
+      fetchStablecoinsSupply(),
+      fetchYields(),
+      fetchVolumes(),
+      fetchFees()
+    ]);
+
+    return {
+      fearGreedIndex: fearGreedData,
+      marketDominance: dominanceData,
+      globalMetrics: globalData,
+      defiProtocols: protocolsData,
+      defiChains: chainsData,
+      stablecoins: stablecoinsData.stablecoins,
+      chainStables: stablecoinsData.chainStables,
+      yields: yieldsData,
+      volumes: volumesData,
+      fees: feesData
+    };
+  } catch (error) {
+    console.error('Error fetching metrics:', error);
+    throw error;
+  }
 } 

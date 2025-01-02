@@ -20,7 +20,8 @@ import ManageSymbolsModal from './components/ManageSymbolsModal';
 import ManageMemeTokensModal from './components/ManageMemeTokensModal';
 import { useMemeTokens } from '@/hooks/useMemeTokens';
 import { supabase } from '@/config/supabase';
-import { fetchOKXToken, fetchFearGreedIndex, fetchMarketDominance, fetchGlobalMetrics, fetchProtocolsTVL, fetchChainsTVL, fetchStablecoinsSupply, fetchYields, fetchVolumes, fetchFees } from '@/utils/api';
+import { fetchOKXToken, fetchMetricsFromAPI } from '@/utils/api';
+import { useAuth } from '@/contexts/AuthContext';
 
 // 移除未使用的 ECharts 相关类型
 const TABS: TabConfig[] = [
@@ -78,6 +79,8 @@ export default function CryptoPage() {
 
   const MAX_RETRIES = 3;
   const RETRY_DELAY = 30000; // 30秒
+
+  const { username } = useAuth();
 
   const fetchSymbolData = useCallback(async (symbol: string, retryCount = 0): Promise<KLineData[]> => {
     try {
@@ -180,20 +183,22 @@ export default function CryptoPage() {
     }
   }, [error]);
 
-  // 修改 fetchMemeTokensData 函数，只在手动刷新时调用
+  // 修改 fetchMemeTokensData 函数
   const fetchMemeTokensData = useCallback(async () => {
-    if (memeTokens.length === 0) return;
+    if (!memeTokens || memeTokens.length === 0) return;
 
     setIsMemeDataLoading(true);
     setError(null);
 
     try {
       for (const token of memeTokens) {
+        if (!token.contract_address) continue;
+
         const response = await fetchOKXToken(token.contract_address);
 
-        if (response.data?.data?.[0]) {
+        if (response?.data?.data?.[0]) {
           const tokenInfo = response.data.data[0];
-          await supabase
+          const { error: updateError } = await supabase
             .from('meme_tokens')
             .update({
               volume24h: tokenInfo.volume24h || '',
@@ -201,6 +206,11 @@ export default function CryptoPage() {
               updated_at: new Date().toISOString()
             })
             .eq('contract_address', token.contract_address);
+
+          if (updateError) {
+            console.error('Error updating token:', updateError);
+            continue;
+          }
         }
       }
 
@@ -233,130 +243,65 @@ export default function CryptoPage() {
     if (tab === 'meme') {
       void fetchTokens();
     }
-  };
+    // 切换到其他数据标签时，获取缓存数据
+    else if (tab === 'others' && username) {
+      // 从数据库获取最新的缓存数据
+      void supabase
+        .from('cached_metrics')
+        .select('metrics, last_updated')
+        .eq('user_id', username)
+        .order('last_updated', { ascending: false })
+        .limit(1)
+        .single()
+        .then(({ data, error }) => {
+          if (error) {
+            console.error('Error fetching cached metrics:', error);
+            // 如果没有缓存数据，则获取新数据
+            if (error.code === 'PGRST116') {
+              void handleOtherDataRefresh();
+            }
+            return;
+          }
 
-  // 分别定义各个数据的获取方法
-  const fetchFearGreed = async () => {
-    try {
-      const data = await fetchFearGreedIndex();
-      setMarketMetrics(prev => ({ ...prev, fearGreedIndex: data }));
-    } catch (err) {
-      console.error('Error fetching fear & greed index:', err);
-      throw err;
+          if (data?.metrics) {
+            setMarketMetrics(data.metrics);
+            setOtherDataLastUpdate(new Date(data.last_updated).toLocaleString());
+          }
+        });
     }
   };
 
-  const fetchDominance = async () => {
-    try {
-      const data = await fetchMarketDominance();
-      setMarketMetrics(prev => ({ ...prev, marketDominance: data }));
-    } catch (err) {
-      console.error('Error fetching market dominance:', err);
-      throw err;
-    }
-  };
-
-  const fetchGlobal = async () => {
-    try {
-      const data = await fetchGlobalMetrics();
-      setMarketMetrics(prev => ({ ...prev, globalMetrics: data }));
-    } catch (err) {
-      console.error('Error fetching global metrics:', err);
-      throw err;
-    }
-  };
-
-  const fetchDefiProtocols = async () => {
-    try {
-      const data = await fetchProtocolsTVL();
-      setMarketMetrics(prev => ({ ...prev, defiProtocols: data }));
-    } catch (err) {
-      console.error('Error fetching DeFi protocols:', err);
-      throw err;
-    }
-  };
-
-  const fetchDefiChains = async () => {
-    try {
-      const data = await fetchChainsTVL();
-      setMarketMetrics(prev => ({ ...prev, defiChains: data }));
-    } catch (err) {
-      console.error('Error fetching DeFi chains:', err);
-      throw err;
-    }
-  };
-
-  const fetchStablecoinsData = async () => {
-    try {
-      const { stablecoins, chainStables, lastUpdate } = await fetchStablecoinsSupply();
-      setMarketMetrics(prev => ({ ...prev, stablecoins: {
-        stablecoins,
-        lastUpdate
-      }, chainStables: {
-        chainStables,
-        lastUpdate
-      } }));
-    } catch (err) {
-      console.error('Error fetching stablecoins:', err);
-      throw err;
-    }
-  };
-
-  const fetchYieldsData = async () => {
-    try {
-      const data = await fetchYields();
-      setMarketMetrics(prev => ({ ...prev, yields: data }));
-    } catch (err) {
-      console.error('Error fetching yields:', err);
-      throw err;
-    }
-  };
-
-  const fetchVolumesData = async () => {
-    try {
-      const data = await fetchVolumes();
-      setMarketMetrics(prev => ({ ...prev, volumes: data }));
-    } catch (err) {
-      console.error('Error fetching volumes:', err);
-      throw err;
-    }
-  };
-
-  const fetchFeesData = async () => {
-    try {
-      const data = await fetchFees();
-      setMarketMetrics(prev => ({ ...prev, fees: data }));
-    } catch (err) {
-      console.error('Error fetching fees:', err);
-      throw err;
-    }
-  };
+  
 
   // 修改统一的刷新方法
-  const handleOtherDataRefresh = async () => {
+  const handleOtherDataRefresh = useCallback(async () => {
+    if (!username) return;
+    
     setOtherDataLoading(true);
-    setError(null);
-
     try {
-      await Promise.all([
-        fetchFearGreed(),
-        fetchDominance(),
-        fetchGlobal(),
-        fetchDefiProtocols(),
-        fetchDefiChains(),
-        fetchStablecoinsData(),
-        fetchYieldsData(),
-        fetchVolumesData(),
-        fetchFeesData()
-      ]);
-      
+      const newMetrics = await fetchMetricsFromAPI();
+      setMarketMetrics(newMetrics);
       setOtherDataLastUpdate(new Date().toLocaleString());
+
+      // 一次性保存所有数据到数据库
+      const { error } = await supabase
+        .from('cached_metrics')
+        .upsert({
+          user_id: username,
+          metrics: newMetrics,
+          last_updated: new Date().toISOString()
+        });
+
+      if (error) {
+        console.error('Error saving metrics to cache:', error);
+      }
     } catch (err) {
+      console.error('Error refreshing other data:', err);
       setError(err instanceof Error ? err.message : '获取数据失败');
     } finally {
       setOtherDataLoading(false);
     }
-  };
+  }, [username]);
 
   // 渲染当前标签页内容
   const renderTabContent = () => {

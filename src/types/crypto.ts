@@ -94,25 +94,19 @@ export interface MarketMetrics {
     }>;
     lastUpdate: string;
   };
-  stablecoins?: {
-    stablecoins: Array<{
-      name: string;
-      symbol: string;
-      circulating: string;
-      price: string;
-      change1d: string;
-      change7d: string;
-      change30d: string;
-    }>;
-    lastUpdate: string;
-  };
-  chainStables?: {
-    chainStables: Array<{
-      name: string;
-      totalCirculating: string;
-    }>;
-    lastUpdate: string;
-  };
+  stablecoins?: Array<{
+    name: string;
+    symbol: string;
+    circulating: string;
+    price: string;
+    change1d: string;
+    change7d: string;
+    change30d: string;
+  }>;
+  chainStables?: Array<{
+    name: string;
+    totalCirculating: string;
+  }>;
   yields?: {
     protocols: Array<{
       name: string;
