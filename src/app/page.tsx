@@ -15,10 +15,10 @@ export default function Home() {
       href: "/vocabulary"
     },
     {
-      title: "金融计算器",
-      description: "各类金融计算工具，支持利率、投资收益等计算",
-      icon: "🧮",
-      href: "/calculator"
+      title: "常用知识",
+      description: "日常知识，程序知识，交易知识等",
+      icon: "📖",
+      href: "/knowledge"
     },
     {
       title: "币圈数据",
