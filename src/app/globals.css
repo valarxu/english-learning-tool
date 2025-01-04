@@ -5,6 +5,9 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --gradient-from: #729A93;
+  --gradient-via: #A4BFB9;
+  --gradient-to: #FBFEE5;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -18,4 +21,16 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* 添加自定义类 */
+@layer components {
+  .page-gradient-bg {
+    @apply min-h-screen p-5;
+    background: linear-gradient(to bottom right, 
+      rgba(114, 154, 147, 0.7),
+      rgba(164, 191, 185, 0.6),
+      rgba(251, 254, 229, 0.7)
+    );
+  }
 }

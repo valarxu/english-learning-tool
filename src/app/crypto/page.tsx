@@ -342,7 +342,7 @@ export default function CryptoPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-emerald-200/70 via-green-300/60 to-teal-400/70 p-3">
+      <div className="page-gradient-bg">
         {/* 顶部导航栏 */}
         <div className="flex items-center gap-4 mb-4">
           <Link

@@ -148,11 +148,11 @@ export default function VocabularyPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-emerald-200/70 via-green-300/60 to-teal-400/70 p-5 relative">
+      <div className="page-gradient-bg relative">
         {/* 顶部导航栏 */}
-        <div className="absolute top-4 left-4 right-4 flex items-center">
+        <div className="absolute top-4 left-4 right-4 flex items-center gap-4">
           {/* 返回首页按钮 */}
-          <Link 
+          <Link
             href="/"
             className="px-4 py-2 rounded-lg bg-white/90 text-emerald-600 
               transition-all duration-300 backdrop-blur-md font-medium
@@ -165,7 +165,7 @@ export default function VocabularyPage() {
           </Link>
 
           {/* 统计信息 */}
-          <div className="ml-4 bg-white/90 rounded-lg px-4 py-2 shadow-lg flex items-center">
+          <div className="bg-white/90 rounded-lg px-4 py-2 shadow-lg flex items-center">
             <div className="flex gap-6">
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-500">场景数量</span>
@@ -178,6 +178,33 @@ export default function VocabularyPage() {
               </div>
             </div>
           </div>
+          {/* 随机场景按钮 */}
+          <button
+            onClick={openRandomCard}
+            className="w-8 h-8 bg-white shadow-lg hover:shadow-xl rounded-full flex items-center justify-center text-emerald-600 border border-emerald-100 hover:scale-110 transition-all duration-300 group"
+          >
+            <svg
+              className="w-6 h-6 transform group-hover:rotate-180 transition-transform duration-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+          </button>
+
+          {/* 添加场景按钮 */}
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="w-8 h-8 bg-white shadow-lg hover:shadow-xl rounded-full flex items-center justify-center text-emerald-600 text-2xl border border-emerald-100 hover:scale-110 transition-all duration-300"
+          >
+            +
+          </button>
         </div>
 
         {/* 卡片列表 */}
@@ -210,27 +237,27 @@ export default function VocabularyPage() {
                   onClick={(e) => handleDeleteCard(card, e)}
                   className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300"
                 >
-                  <svg 
-                    className="w-4 h-4 text-gray-400 hover:text-red-500 transition-colors duration-300" 
-                    fill="none" 
-                    stroke="currentColor" 
+                  <svg
+                    className="w-4 h-4 text-gray-400 hover:text-red-500 transition-colors duration-300"
+                    fill="none"
+                    stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth={2} 
-                      d="M6 18L18 6M6 6l12 12" 
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
                     />
                   </svg>
                 </button>
 
                 {/* 标题 */}
                 <h3 className="text-lg font-medium text-gray-800 mb-2">{card.title}</h3>
-                
+
                 {/* 描述 */}
                 <p className="text-gray-600 text-sm flex-grow line-clamp-3">{card.description}</p>
-                
+
                 {/* 单词数量 */}
                 <div className="mt-auto pt-3">
                   <span className="text-sm bg-emerald-100 text-emerald-600 rounded-full px-3 py-1 inline-block font-medium">
@@ -242,44 +269,13 @@ export default function VocabularyPage() {
           </div>
         )}
 
-        {/* 添加按钮 */}
-        <div className="fixed bottom-8 right-8 flex flex-col gap-4">
-          {/* 随机场景按钮 */}
-          <button
-            onClick={openRandomCard}
-            className="w-14 h-14 bg-white shadow-lg hover:shadow-xl rounded-full flex items-center justify-center text-emerald-600 border border-emerald-100 hover:scale-110 transition-all duration-300 group"
-          >
-            <svg 
-              className="w-6 h-6 transform group-hover:rotate-180 transition-transform duration-500" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" 
-              />
-            </svg>
-          </button>
-
-          {/* 添加场景按钮 */}
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="w-14 h-14 bg-white shadow-lg hover:shadow-xl rounded-full flex items-center justify-center text-emerald-600 text-2xl border border-emerald-100 hover:scale-110 transition-all duration-300"
-          >
-            +
-          </button>
-        </div>
-
         {/* Modal 样式更新为白色风格 */}
         {isModalOpen && (
-          <div 
+          <div
             className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center p-4 z-50"
             onClick={() => setIsModalOpen(false)}
           >
-            <div 
+            <div
               className="bg-white rounded-2xl p-6 w-full max-w-md border border-gray-100 shadow-2xl"
               onClick={e => e.stopPropagation()}
             >
@@ -327,11 +323,11 @@ export default function VocabularyPage() {
 
         {/* 单词管理 Modal */}
         {isWordModalOpen && selectedCard && (
-          <div 
+          <div
             className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center p-4 z-50"
             onClick={handleCloseWordModal}
           >
-            <div 
+            <div
               className="bg-white rounded-2xl p-6 w-full max-w-4xl border border-gray-100 shadow-2xl max-h-[80vh] overflow-y-auto"
               onClick={e => e.stopPropagation()}
             >
@@ -399,17 +395,17 @@ export default function VocabularyPage() {
                       onClick={(e) => handleDeleteWord(word, e)}
                       className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300"
                     >
-                      <svg 
-                        className="w-4 h-4 text-gray-400 hover:text-red-500 transition-colors duration-300" 
-                        fill="none" 
-                        stroke="currentColor" 
+                      <svg
+                        className="w-4 h-4 text-gray-400 hover:text-red-500 transition-colors duration-300"
+                        fill="none"
+                        stroke="currentColor"
                         viewBox="0 0 24 24"
                       >
-                        <path 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round" 
-                          strokeWidth={2} 
-                          d="M6 18L18 6M6 6l12 12" 
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
                         />
                       </svg>
                     </button>
@@ -418,20 +414,18 @@ export default function VocabularyPage() {
                       {/* 单词和释义的切换动画 */}
                       <div className="relative h-20 flex items-center justify-center">
                         <div
-                          className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${
-                            visibleMeanings.has(word.id || `${index}`)
-                              ? 'opacity-0 scale-95 -translate-y-2'
-                              : 'opacity-100 scale-100 translate-y-0'
-                          }`}
+                          className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${visibleMeanings.has(word.id || `${index}`)
+                            ? 'opacity-0 scale-95 -translate-y-2'
+                            : 'opacity-100 scale-100 translate-y-0'
+                            }`}
                         >
                           <h3 className="text-xl font-medium text-gray-800">{word.word}</h3>
                         </div>
                         <div
-                          className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${
-                            visibleMeanings.has(word.id || `${index}`)
-                              ? 'opacity-100 scale-100 translate-y-0'
-                              : 'opacity-0 scale-95 translate-y-2'
-                          }`}
+                          className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${visibleMeanings.has(word.id || `${index}`)
+                            ? 'opacity-100 scale-100 translate-y-0'
+                            : 'opacity-0 scale-95 translate-y-2'
+                            }`}
                         >
                           <p className="text-gray-600">{word.meaning}</p>
                         </div>
@@ -453,11 +447,11 @@ export default function VocabularyPage() {
 
         {/* 确认删除 Modal */}
         {cardToDelete && (
-          <div 
+          <div
             className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center p-4 z-50"
             onClick={() => setCardToDelete(null)}
           >
-            <div 
+            <div
               className="bg-white rounded-2xl p-6 w-full max-w-md border border-gray-100 shadow-2xl"
               onClick={e => e.stopPropagation()}
             >
@@ -485,11 +479,11 @@ export default function VocabularyPage() {
 
         {/* 删除单词确认 Modal */}
         {wordToDelete && (
-          <div 
+          <div
             className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center p-4 z-50"
             onClick={() => setWordToDelete(null)}
           >
-            <div 
+            <div
               className="bg-white rounded-2xl p-6 w-full max-w-md border border-gray-100 shadow-2xl"
               onClick={e => e.stopPropagation()}
             >

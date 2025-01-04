@@ -113,7 +113,7 @@ export default function KnowledgePage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-emerald-200/70 via-green-300/60 to-teal-400/70 p-5">
+      <div className="page-gradient-bg">
         <Link 
           href="/"
           className="absolute top-4 left-4 px-4 py-2 rounded-lg bg-white/90 text-emerald-600 

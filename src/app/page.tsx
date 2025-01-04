@@ -36,7 +36,7 @@ export default function Home() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-emerald-200/70 via-green-300/60 to-teal-400/70 p-5">
+      <div className="page-gradient-bg">
         {/* 添加登出按钮 */}
         <button
           onClick={logout}
