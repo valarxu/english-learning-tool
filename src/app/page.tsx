@@ -27,6 +27,12 @@ export default function Home() {
       href: "/crypto"
     },
     {
+      title: "回测数据",
+      description: "交易策略回测数据分析和性能评估",
+      icon: "📈",
+      href: "/backtest"
+    },
+    {
       title: "待办事项",
       description: "任务管理和日程规划，提高工作效率",
       icon: "✓",
