@@ -6,9 +6,33 @@ import type { MemeToken } from '@/types/crypto';
 interface MemeCoinsProps {
   tokens: MemeToken[];
   onCopyAddress: (address: string) => void;
+  isLoading?: boolean;
 }
 
-export default function MemeCoins({ tokens, onCopyAddress }: MemeCoinsProps) {
+export default function MemeCoins({ tokens, onCopyAddress, isLoading = false }: MemeCoinsProps) {
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        {[1, 2, 3, 4, 5, 6].map((i) => (
+          <div key={i} className="bg-white/90 rounded-lg p-4 shadow-lg animate-pulse">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+              <div className="flex-1">
+                <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+                <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="h-3 bg-gray-200 rounded w-full"></div>
+              <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+              <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   const formatNumber = (value: string | number | undefined) => {
     if (!value) return '0';
     const num = typeof value === 'string' ? parseFloat(value) : value;
@@ -30,14 +54,14 @@ export default function MemeCoins({ tokens, onCopyAddress }: MemeCoinsProps) {
     const v = parseFloat(volume);
     const m = parseFloat(marketCap);
     if (m === 0) return 0;
-    return (v / m) * 100; // 转换为百分比
+    return (v / m) * 100;
   };
 
   // 按市值排序的代币列表
   const sortedTokens = [...tokens].sort((a, b) => {
     const marketCapA = a.marketCap ? parseFloat(a.marketCap) : 0;
     const marketCapB = b.marketCap ? parseFloat(b.marketCap) : 0;
-    return marketCapB - marketCapA; // 降序排列
+    return marketCapB - marketCapA;
   });
 
   return (
