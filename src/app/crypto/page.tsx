@@ -309,9 +309,13 @@ export default function CryptoPage() {
       case 'mainstream':
         return (
           <MainstreamCoins
-            symbols={mainstreamSymbols}
             klineData={mainstreamData}
+            symbols={mainstreamSymbols}
+            loading={mainstreamLoading}
             loadingStates={mainstreamLoadingStates}
+            lastUpdate={mainstreamLastUpdate}
+            onRefresh={fetchMainstreamData}
+            onOpenModal={() => setIsMainstreamModalOpen(true)}
           />
         );
       case 'meme':
@@ -319,6 +323,7 @@ export default function CryptoPage() {
           <MemeCoins
             tokens={memeTokens}
             onCopyAddress={handleCopyAddress}
+            isLoading={isMemeDataLoading}
           />
         );
       case 'others':
