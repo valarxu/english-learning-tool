@@ -191,34 +191,29 @@ export default function CryptoPage() {
     setError(null);
 
     try {
-      // 并行发起所有 OKX API 请求
-      const tokenPromises = memeTokens
-        .filter(token => token.contract_address)
-        .map(async token => {
-          const response = await fetchOKXToken(token.contract_address);
-          return {
-            contract_address: token.contract_address,
-            tokenInfo: response?.data?.data?.[0]
-          };
-        });
+      for (const token of memeTokens) {
+        if (!token.contract_address) continue;
 
-      const results = await Promise.all(tokenPromises);
+        const response = await fetchOKXToken(token.contract_address);
 
-      // 并行更新数据库
-      const updatePromises = results
-        .filter(result => result.tokenInfo)
-        .map(({ contract_address, tokenInfo }) =>
-          supabase
+        if (response?.data?.data?.[0]) {
+          const tokenInfo = response.data.data[0];
+          const { error: updateError } = await supabase
             .from('meme_tokens')
             .update({
               volume24h: tokenInfo.volume24h || '',
               marketCap: tokenInfo.marketCap || '',
               updated_at: new Date().toISOString()
             })
-            .eq('contract_address', contract_address)
-        );
+            .eq('contract_address', token.contract_address);
 
-      await Promise.all(updatePromises);
+          if (updateError) {
+            console.error('Error updating token:', updateError);
+            continue;
+          }
+        }
+      }
+
       await fetchTokens();
       setMemeLastUpdate(new Date().toLocaleString());
     } catch (err) {
