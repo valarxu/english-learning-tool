@@ -330,6 +330,8 @@ export default function CryptoPage() {
         return (
           <OtherData
             metrics={marketMetrics}
+            onRefresh={handleOtherDataRefresh}
+            isLoading={otherDataLoading}
           />
         );
       case 'wallet':

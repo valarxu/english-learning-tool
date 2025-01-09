@@ -20,9 +20,6 @@ export default function MainstreamCoins({
   klineData, 
   loadingStates,
   loading,
-  lastUpdate,
-  onRefresh,
-  onOpenModal 
 }: MainstreamCoinsProps) {
   if (loading) {
     return (
@@ -44,26 +41,6 @@ export default function MainstreamCoins({
 
   return (
     <>
-      <div className="mb-4 flex items-center justify-between">
-        <div className="text-sm text-gray-500">
-          {lastUpdate && `更新于: ${lastUpdate}`}
-        </div>
-        <div className="flex gap-2">
-          <button
-            onClick={onOpenModal}
-            className="px-3 py-1 bg-emerald-500 text-white text-sm rounded hover:bg-emerald-600 transition-colors"
-          >
-            管理货币
-          </button>
-          <button
-            onClick={onRefresh}
-            className="px-3 py-1 bg-emerald-500 text-white text-sm rounded hover:bg-emerald-600 transition-colors"
-          >
-            刷新数据
-          </button>
-        </div>
-      </div>
-
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {symbols.map(symbol => (
           <div key={symbol} className="bg-white/90 rounded-lg p-2 shadow-lg">
