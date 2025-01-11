@@ -1,0 +1,163 @@
+{
+  "2024": {
+    "trade_counts": {
+      "long": 15,
+      "short": 18,
+      "total": 33
+    },
+    "win_rates": {
+      "long": 26.67,
+      "short": 16.67,
+      "total": 21.21
+    },
+    "long_stats": {
+      "avg_profit": 2014.17,
+      "max_profit": 31102.58,
+      "max_loss": -748.84
+    },
+    "short_stats": {
+      "avg_profit": -293.2,
+      "max_profit": 834.78,
+      "max_loss": -1600.24
+    },
+    "total_profit": 24934.85
+  },
+  "2023": {
+    "trade_counts": {
+      "long": 20,
+      "short": 18,
+      "total": 38
+    },
+    "win_rates": {
+      "long": 20.0,
+      "short": 16.67,
+      "total": 18.42
+    },
+    "long_stats": {
+      "avg_profit": -60.9,
+      "max_profit": 2705.38,
+      "max_loss": -1647.25
+    },
+    "short_stats": {
+      "avg_profit": -276.52,
+      "max_profit": 2337.65,
+      "max_loss": -2530.34
+    },
+    "total_profit": -6195.25
+  },
+  "2022": {
+    "trade_counts": {
+      "long": 17,
+      "short": 20,
+      "total": 37
+    },
+    "win_rates": {
+      "long": 23.53,
+      "short": 30.0,
+      "total": 27.03
+    },
+    "long_stats": {
+      "avg_profit": -170.91,
+      "max_profit": 2108.64,
+      "max_loss": -872.67
+    },
+    "short_stats": {
+      "avg_profit": 134.41,
+      "max_profit": 4968.5,
+      "max_loss": -991.33
+    },
+    "total_profit": -217.23
+  },
+  "2021": {
+    "trade_counts": {
+      "long": 16,
+      "short": 11,
+      "total": 27
+    },
+    "win_rates": {
+      "long": 37.5,
+      "short": 36.36,
+      "total": 37.04
+    },
+    "long_stats": {
+      "avg_profit": 850.18,
+      "max_profit": 12187.54,
+      "max_loss": -2358.16
+    },
+    "short_stats": {
+      "avg_profit": 94.59,
+      "max_profit": 4525.86,
+      "max_loss": -1979.89
+    },
+    "total_profit": 14643.41
+  },
+  "2020": {
+    "trade_counts": {
+      "long": 16,
+      "short": 13,
+      "total": 29
+    },
+    "win_rates": {
+      "long": 37.5,
+      "short": 38.46,
+      "total": 37.93
+    },
+    "long_stats": {
+      "avg_profit": 781.98,
+      "max_profit": 10222.75,
+      "max_loss": -1357.1
+    },
+    "short_stats": {
+      "avg_profit": 103.2,
+      "max_profit": 3419.96,
+      "max_loss": -1694.47
+    },
+    "total_profit": 13853.21
+  },
+  "2019": {
+    "trade_counts": {
+      "long": 14,
+      "short": 13,
+      "total": 27
+    },
+    "win_rates": {
+      "long": 28.57,
+      "short": 38.46,
+      "total": 33.33
+    },
+    "long_stats": {
+      "avg_profit": -21.9,
+      "max_profit": 2391.63,
+      "max_loss": -548.24
+    },
+    "short_stats": {
+      "avg_profit": 113.73,
+      "max_profit": 1980.46,
+      "max_loss": -1126.65
+    },
+    "total_profit": 1171.87
+  },
+  "2018": {
+    "trade_counts": {
+      "long": 10,
+      "short": 13,
+      "total": 23
+    },
+    "win_rates": {
+      "long": 20.0,
+      "short": 30.77,
+      "total": 26.09
+    },
+    "long_stats": {
+      "avg_profit": 16.15,
+      "max_profit": 4510.41,
+      "max_loss": -737.73
+    },
+    "short_stats": {
+      "avg_profit": 126.14,
+      "max_profit": 2480.25,
+      "max_loss": -876.65
+    },
+    "total_profit": 1801.23
+  }
+}

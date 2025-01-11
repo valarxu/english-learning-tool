@@ -1,0 +1,117 @@
+{
+  "2024": {
+    "trade_counts": {
+      "long": 18,
+      "short": 14,
+      "total": 32
+    },
+    "win_rates": {
+      "long": 33.33,
+      "short": 35.71,
+      "total": 34.38
+    },
+    "long_stats": {
+      "avg_profit": 703.16,
+      "max_profit": 10053.65,
+      "max_loss": -797.19
+    },
+    "short_stats": {
+      "avg_profit": 36.22,
+      "max_profit": 3579.39,
+      "max_loss": -1263.4
+    },
+    "total_profit": 13163.93
+  },
+  "2023": {
+    "trade_counts": {
+      "long": 22,
+      "short": 22,
+      "total": 44
+    },
+    "win_rates": {
+      "long": 27.27,
+      "short": 27.27,
+      "total": 27.27
+    },
+    "long_stats": {
+      "avg_profit": -132.02,
+      "max_profit": 1587.09,
+      "max_loss": -673.03
+    },
+    "short_stats": {
+      "avg_profit": -79.75,
+      "max_profit": 2427.57,
+      "max_loss": -782.11
+    },
+    "total_profit": -4658.76
+  },
+  "2022": {
+    "trade_counts": {
+      "long": 15,
+      "short": 15,
+      "total": 30
+    },
+    "win_rates": {
+      "long": 26.67,
+      "short": 53.33,
+      "total": 40.0
+    },
+    "long_stats": {
+      "avg_profit": -154.19,
+      "max_profit": 1865.96,
+      "max_loss": -1078.45
+    },
+    "short_stats": {
+      "avg_profit": 445.11,
+      "max_profit": 4030.23,
+      "max_loss": -550.33
+    },
+    "total_profit": 4363.79
+  },
+  "2021": {
+    "trade_counts": {
+      "long": 26,
+      "short": 14,
+      "total": 40
+    },
+    "win_rates": {
+      "long": 19.23,
+      "short": 42.86,
+      "total": 27.5
+    },
+    "long_stats": {
+      "avg_profit": 657.65,
+      "max_profit": 25366.3,
+      "max_loss": -1858.25
+    },
+    "short_stats": {
+      "avg_profit": -58.7,
+      "max_profit": 2483.56,
+      "max_loss": -2336.77
+    },
+    "total_profit": 16277.17
+  },
+  "2020": {
+    "trade_counts": {
+      "long": 5,
+      "short": 3,
+      "total": 8
+    },
+    "win_rates": {
+      "long": 20.0,
+      "short": 0.0,
+      "total": 12.5
+    },
+    "long_stats": {
+      "avg_profit": -491.87,
+      "max_profit": 1111.19,
+      "max_loss": -1418.19
+    },
+    "short_stats": {
+      "avg_profit": -639.66,
+      "max_profit": -167.53,
+      "max_loss": -1179.05
+    },
+    "total_profit": -4378.32
+  }
+}

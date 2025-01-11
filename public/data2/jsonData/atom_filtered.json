@@ -1,0 +1,1427 @@
+[
+  {
+    "signal": "long",
+    "datetime": "2024-12-18",
+    "profit_usdt": -754.97
+  },
+  {
+    "signal": "short",
+    "datetime": "2024-12-12",
+    "profit_usdt": 135.9
+  },
+  {
+    "signal": "long",
+    "datetime": "2024-12-09",
+    "profit_usdt": 11819.65
+  },
+  {
+    "signal": "short",
+    "datetime": "2024-11-06",
+    "profit_usdt": -22.38
+  },
+  {
+    "signal": "long",
+    "datetime": "2024-11-01",
+    "profit_usdt": -796.39
+  },
+  {
+    "signal": "short",
+    "datetime": "2024-10-29",
+    "profit_usdt": -337.42
+  },
+  {
+    "signal": "long",
+    "datetime": "2024-10-26",
+    "profit_usdt": -512.62
+  },
+  {
+    "signal": "short",
+    "datetime": "2024-10-20",
+    "profit_usdt": -825.83
+  },
+  {
+    "signal": "long",
+    "datetime": "2024-10-17",
+    "profit_usdt": -311.1
+  },
+  {
+    "signal": "short",
+    "datetime": "2024-10-14",
+    "profit_usdt": -33.59
+  },
+  {
+    "signal": "long",
+    "datetime": "2024-10-08",
+    "profit_usdt": -672.62
+  },
+  {
+    "signal": "short",
+    "datetime": "2024-10-07",
+    "profit_usdt": 128.03
+  },
+  {
+    "signal": "long",
+    "datetime": "2024-09-30",
+    "profit_usdt": 1417.68
+  },
+  {
+    "signal": "short",
+    "datetime": "2024-09-17",
+    "profit_usdt": -357.78
+  },
+  {
+    "signal": "long",
+    "datetime": "2024-09-16",
+    "profit_usdt": 438.07
+  },
+  {
+    "signal": "short",
+    "datetime": "2024-09-09",
+    "profit_usdt": 2166.6
+  },
+  {
+    "signal": "long",
+    "datetime": "2024-08-26",
+    "profit_usdt": 383.87
+  },
+  {
+    "signal": "short",
+    "datetime": "2024-08-20",
+    "profit_usdt": 2061.06
+  },
+  {
+    "signal": "long",
+    "datetime": "2024-07-31",
+    "profit_usdt": -410.23
+  },
+  {
+    "signal": "short",
+    "datetime": "2024-07-27",
+    "profit_usdt": -13.62
+  },
+  {
+    "signal": "long",
+    "datetime": "2024-07-19",
+    "profit_usdt": 34.42
+  },
+  {
+    "signal": "short",
+    "datetime": "2024-07-13",
+    "profit_usdt": 605.44
+  },
+  {
+    "signal": "long",
+    "datetime": "2024-07-03",
+    "profit_usdt": -343.76
+  },
+  {
+    "signal": "short",
+    "datetime": "2024-07-02",
+    "profit_usdt": -347.51
+  },
+  {
+    "signal": "long",
+    "datetime": "2024-06-30",
+    "profit_usdt": -450.42
+  },
+  {
+    "signal": "short",
+    "datetime": "2024-06-25",
+    "profit_usdt": 1307.93
+  },
+  {
+    "signal": "long",
+    "datetime": "2024-06-08",
+    "profit_usdt": -786.34
+  },
+  {
+    "signal": "short",
+    "datetime": "2024-05-28",
+    "profit_usdt": -492.59
+  },
+  {
+    "signal": "long",
+    "datetime": "2024-05-23",
+    "profit_usdt": -462.7
+  },
+  {
+    "signal": "short",
+    "datetime": "2024-05-21",
+    "profit_usdt": -428.94
+  },
+  {
+    "signal": "long",
+    "datetime": "2024-05-19",
+    "profit_usdt": -175.52
+  },
+  {
+    "signal": "short",
+    "datetime": "2024-05-16",
+    "profit_usdt": 247.71
+  },
+  {
+    "signal": "long",
+    "datetime": "2024-05-11",
+    "profit_usdt": 298.29
+  },
+  {
+    "signal": "short",
+    "datetime": "2024-05-01",
+    "profit_usdt": -66.45
+  },
+  {
+    "signal": "long",
+    "datetime": "2024-04-25",
+    "profit_usdt": -344.34
+  },
+  {
+    "signal": "short",
+    "datetime": "2024-04-21",
+    "profit_usdt": 2570.69
+  },
+  {
+    "signal": "long",
+    "datetime": "2024-04-01",
+    "profit_usdt": -389.42
+  },
+  {
+    "signal": "short",
+    "datetime": "2024-03-25",
+    "profit_usdt": 160.13
+  },
+  {
+    "signal": "long",
+    "datetime": "2024-03-15",
+    "profit_usdt": -1305.45
+  },
+  {
+    "signal": "short",
+    "datetime": "2024-03-07",
+    "profit_usdt": -2467.31
+  },
+  {
+    "signal": "long",
+    "datetime": "2024-03-06",
+    "profit_usdt": 1049.35
+  },
+  {
+    "signal": "short",
+    "datetime": "2024-02-24",
+    "profit_usdt": -297.03
+  },
+  {
+    "signal": "long",
+    "datetime": "2024-02-21",
+    "profit_usdt": -260.7
+  },
+  {
+    "signal": "short",
+    "datetime": "2024-02-14",
+    "profit_usdt": -783.0
+  },
+  {
+    "signal": "long",
+    "datetime": "2024-02-12",
+    "profit_usdt": 264.69
+  },
+  {
+    "signal": "short",
+    "datetime": "2024-02-07",
+    "profit_usdt": 32.47
+  },
+  {
+    "signal": "long",
+    "datetime": "2024-01-31",
+    "profit_usdt": -347.66
+  },
+  {
+    "signal": "short",
+    "datetime": "2024-01-26",
+    "profit_usdt": -80.43
+  },
+  {
+    "signal": "long",
+    "datetime": "2024-01-19",
+    "profit_usdt": -768.41
+  },
+  {
+    "signal": "short",
+    "datetime": "2024-01-11",
+    "profit_usdt": 534.49
+  },
+  {
+    "signal": "long",
+    "datetime": "2023-12-30",
+    "profit_usdt": -320.54
+  },
+  {
+    "signal": "short",
+    "datetime": "2023-12-22",
+    "profit_usdt": -870.85
+  },
+  {
+    "signal": "long",
+    "datetime": "2023-12-18",
+    "profit_usdt": -511.86
+  },
+  {
+    "signal": "short",
+    "datetime": "2023-12-12",
+    "profit_usdt": -1074.27
+  },
+  {
+    "signal": "long",
+    "datetime": "2023-12-11",
+    "profit_usdt": 453.66
+  },
+  {
+    "signal": "short",
+    "datetime": "2023-11-26",
+    "profit_usdt": -606.13
+  },
+  {
+    "signal": "long",
+    "datetime": "2023-11-21",
+    "profit_usdt": 3846.8
+  },
+  {
+    "signal": "short",
+    "datetime": "2023-10-21",
+    "profit_usdt": 17.03
+  },
+  {
+    "signal": "long",
+    "datetime": "2023-10-11",
+    "profit_usdt": -1020.39
+  },
+  {
+    "signal": "short",
+    "datetime": "2023-10-10",
+    "profit_usdt": -112.48
+  },
+  {
+    "signal": "long",
+    "datetime": "2023-10-03",
+    "profit_usdt": -82.53
+  },
+  {
+    "signal": "short",
+    "datetime": "2023-09-29",
+    "profit_usdt": -94.35
+  },
+  {
+    "signal": "long",
+    "datetime": "2023-09-22",
+    "profit_usdt": 571.66
+  },
+  {
+    "signal": "short",
+    "datetime": "2023-09-15",
+    "profit_usdt": -55.79
+  },
+  {
+    "signal": "long",
+    "datetime": "2023-09-10",
+    "profit_usdt": -386.97
+  },
+  {
+    "signal": "short",
+    "datetime": "2023-09-07",
+    "profit_usdt": 135.54
+  },
+  {
+    "signal": "long",
+    "datetime": "2023-08-31",
+    "profit_usdt": -426.15
+  },
+  {
+    "signal": "short",
+    "datetime": "2023-08-29",
+    "profit_usdt": 800.68
+  },
+  {
+    "signal": "long",
+    "datetime": "2023-08-16",
+    "profit_usdt": -601.73
+  },
+  {
+    "signal": "short",
+    "datetime": "2023-08-14",
+    "profit_usdt": 704.56
+  },
+  {
+    "signal": "long",
+    "datetime": "2023-07-18",
+    "profit_usdt": -576.71
+  },
+  {
+    "signal": "short",
+    "datetime": "2023-07-14",
+    "profit_usdt": -485.51
+  },
+  {
+    "signal": "long",
+    "datetime": "2023-07-05",
+    "profit_usdt": -483.49
+  },
+  {
+    "signal": "short",
+    "datetime": "2023-07-03",
+    "profit_usdt": -789.49
+  },
+  {
+    "signal": "long",
+    "datetime": "2023-06-29",
+    "profit_usdt": 145.77
+  },
+  {
+    "signal": "short",
+    "datetime": "2023-06-21",
+    "profit_usdt": -430.07
+  },
+  {
+    "signal": "long",
+    "datetime": "2023-06-19",
+    "profit_usdt": -275.63
+  },
+  {
+    "signal": "short",
+    "datetime": "2023-06-13",
+    "profit_usdt": 1362.48
+  },
+  {
+    "signal": "long",
+    "datetime": "2023-06-05",
+    "profit_usdt": -484.95
+  },
+  {
+    "signal": "short",
+    "datetime": "2023-06-04",
+    "profit_usdt": -158.47
+  },
+  {
+    "signal": "long",
+    "datetime": "2023-05-31",
+    "profit_usdt": -196.67
+  },
+  {
+    "signal": "short",
+    "datetime": "2023-05-29",
+    "profit_usdt": -152.16
+  },
+  {
+    "signal": "long",
+    "datetime": "2023-05-19",
+    "profit_usdt": -260.88
+  },
+  {
+    "signal": "short",
+    "datetime": "2023-05-10",
+    "profit_usdt": -332.55
+  },
+  {
+    "signal": "long",
+    "datetime": "2023-04-27",
+    "profit_usdt": -690.42
+  },
+  {
+    "signal": "short",
+    "datetime": "2023-04-26",
+    "profit_usdt": 417.32
+  },
+  {
+    "signal": "long",
+    "datetime": "2023-04-19",
+    "profit_usdt": 409.63
+  },
+  {
+    "signal": "short",
+    "datetime": "2023-04-11",
+    "profit_usdt": -331.73
+  },
+  {
+    "signal": "long",
+    "datetime": "2023-04-07",
+    "profit_usdt": -498.93
+  },
+  {
+    "signal": "short",
+    "datetime": "2023-04-05",
+    "profit_usdt": -550.93
+  },
+  {
+    "signal": "long",
+    "datetime": "2023-04-03",
+    "profit_usdt": -469.42
+  },
+  {
+    "signal": "short",
+    "datetime": "2023-03-30",
+    "profit_usdt": 457.85
+  },
+  {
+    "signal": "long",
+    "datetime": "2023-03-20",
+    "profit_usdt": 278.97
+  },
+  {
+    "signal": "short",
+    "datetime": "2023-03-13",
+    "profit_usdt": 1388.46
+  },
+  {
+    "signal": "long",
+    "datetime": "2023-02-22",
+    "profit_usdt": -500.04
+  },
+  {
+    "signal": "short",
+    "datetime": "2023-02-16",
+    "profit_usdt": -129.0
+  },
+  {
+    "signal": "long",
+    "datetime": "2023-02-07",
+    "profit_usdt": 1000.64
+  },
+  {
+    "signal": "short",
+    "datetime": "2023-01-21",
+    "profit_usdt": -948.29
+  },
+  {
+    "signal": "long",
+    "datetime": "2023-01-19",
+    "profit_usdt": 2764.97
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-12-27",
+    "profit_usdt": 913.09
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-12-06",
+    "profit_usdt": -305.57
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-11-30",
+    "profit_usdt": -867.79
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-11-28",
+    "profit_usdt": -243.56
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-11-23",
+    "profit_usdt": 2972.86
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-11-07",
+    "profit_usdt": 1555.11
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-10-24",
+    "profit_usdt": -327.46
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-10-20",
+    "profit_usdt": -471.25
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-10-17",
+    "profit_usdt": 82.22
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-10-11",
+    "profit_usdt": -679.5
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-10-06",
+    "profit_usdt": 918.8
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-09-19",
+    "profit_usdt": -642.26
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-09-16",
+    "profit_usdt": -967.57
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-09-13",
+    "profit_usdt": 1050.16
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-09-08",
+    "profit_usdt": -663.55
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-09-07",
+    "profit_usdt": 602.9
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-08-30",
+    "profit_usdt": -441.45
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-08-27",
+    "profit_usdt": -125.39
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-08-23",
+    "profit_usdt": 203.27
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-08-16",
+    "profit_usdt": -680.46
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-08-11",
+    "profit_usdt": -1332.54
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-08-10",
+    "profit_usdt": -228.6
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-08-06",
+    "profit_usdt": -1196.03
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-08-02",
+    "profit_usdt": -500.61
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-07-28",
+    "profit_usdt": -1129.83
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-07-25",
+    "profit_usdt": 406.49
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-07-15",
+    "profit_usdt": -902.3
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-07-12",
+    "profit_usdt": -7.77
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-07-02",
+    "profit_usdt": -742.51
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-06-28",
+    "profit_usdt": 1234.28
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-06-20",
+    "profit_usdt": 2734.36
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-06-02",
+    "profit_usdt": -1029.58
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-05-30",
+    "profit_usdt": -216.47
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-05-26",
+    "profit_usdt": -1505.56
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-05-20",
+    "profit_usdt": -1861.6
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-05-19",
+    "profit_usdt": -1851.77
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-05-16",
+    "profit_usdt": 2936.85
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-05-05",
+    "profit_usdt": -1207.38
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-05-05",
+    "profit_usdt": 1423.5
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-04-22",
+    "profit_usdt": -574.77
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-04-20",
+    "profit_usdt": 1400.55
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-04-06",
+    "profit_usdt": -1012.11
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-04-03",
+    "profit_usdt": -1397.0
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-04-01",
+    "profit_usdt": -283.44
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-03-17",
+    "profit_usdt": -1004.21
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-03-14",
+    "profit_usdt": -1367.15
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-03-09",
+    "profit_usdt": -340.16
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-03-06",
+    "profit_usdt": 756.63
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-02-26",
+    "profit_usdt": -303.09
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-02-19",
+    "profit_usdt": -694.43
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-02-15",
+    "profit_usdt": 84.49
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-02-11",
+    "profit_usdt": -333.13
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-02-04",
+    "profit_usdt": -1298.36
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-02-03",
+    "profit_usdt": -1079.08
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-02-01",
+    "profit_usdt": 1788.6
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-01-22",
+    "profit_usdt": -1323.46
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-01-20",
+    "profit_usdt": -764.57
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-01-18",
+    "profit_usdt": -709.38
+  },
+  {
+    "signal": "short",
+    "datetime": "2022-01-13",
+    "profit_usdt": -1798.22
+  },
+  {
+    "signal": "long",
+    "datetime": "2022-01-09",
+    "profit_usdt": 1668.31
+  },
+  {
+    "signal": "short",
+    "datetime": "2021-12-31",
+    "profit_usdt": -658.93
+  },
+  {
+    "signal": "long",
+    "datetime": "2021-12-28",
+    "profit_usdt": 1912.04
+  },
+  {
+    "signal": "short",
+    "datetime": "2021-12-22",
+    "profit_usdt": 629.64
+  },
+  {
+    "signal": "long",
+    "datetime": "2021-12-04",
+    "profit_usdt": -1176.99
+  },
+  {
+    "signal": "short",
+    "datetime": "2021-11-30",
+    "profit_usdt": -104.77
+  },
+  {
+    "signal": "long",
+    "datetime": "2021-11-26",
+    "profit_usdt": -763.86
+  },
+  {
+    "signal": "short",
+    "datetime": "2021-11-22",
+    "profit_usdt": 1321.84
+  },
+  {
+    "signal": "long",
+    "datetime": "2021-11-01",
+    "profit_usdt": 343.06
+  },
+  {
+    "signal": "short",
+    "datetime": "2021-10-19",
+    "profit_usdt": -869.82
+  },
+  {
+    "signal": "long",
+    "datetime": "2021-10-18",
+    "profit_usdt": -1071.58
+  },
+  {
+    "signal": "short",
+    "datetime": "2021-10-14",
+    "profit_usdt": -39.97
+  },
+  {
+    "signal": "long",
+    "datetime": "2021-10-06",
+    "profit_usdt": -775.5
+  },
+  {
+    "signal": "short",
+    "datetime": "2021-10-02",
+    "profit_usdt": -1150.16
+  },
+  {
+    "signal": "long",
+    "datetime": "2021-09-29",
+    "profit_usdt": -1838.75
+  },
+  {
+    "signal": "short",
+    "datetime": "2021-09-23",
+    "profit_usdt": -2280.42
+  },
+  {
+    "signal": "long",
+    "datetime": "2021-09-21",
+    "profit_usdt": 2611.1
+  },
+  {
+    "signal": "short",
+    "datetime": "2021-09-09",
+    "profit_usdt": -3167.67
+  },
+  {
+    "signal": "long",
+    "datetime": "2021-09-07",
+    "profit_usdt": -409.1
+  },
+  {
+    "signal": "short",
+    "datetime": "2021-08-29",
+    "profit_usdt": -1634.69
+  },
+  {
+    "signal": "long",
+    "datetime": "2021-08-26",
+    "profit_usdt": 6927.68
+  },
+  {
+    "signal": "short",
+    "datetime": "2021-07-22",
+    "profit_usdt": -707.96
+  },
+  {
+    "signal": "long",
+    "datetime": "2021-07-19",
+    "profit_usdt": -1916.5
+  },
+  {
+    "signal": "short",
+    "datetime": "2021-07-16",
+    "profit_usdt": -409.35
+  },
+  {
+    "signal": "long",
+    "datetime": "2021-07-14",
+    "profit_usdt": -1173.74
+  },
+  {
+    "signal": "short",
+    "datetime": "2021-07-10",
+    "profit_usdt": -1505.65
+  },
+  {
+    "signal": "long",
+    "datetime": "2021-07-08",
+    "profit_usdt": 1148.09
+  },
+  {
+    "signal": "short",
+    "datetime": "2021-06-29",
+    "profit_usdt": 1139.24
+  },
+  {
+    "signal": "long",
+    "datetime": "2021-06-19",
+    "profit_usdt": -1001.65
+  },
+  {
+    "signal": "short",
+    "datetime": "2021-06-15",
+    "profit_usdt": 98.25
+  },
+  {
+    "signal": "long",
+    "datetime": "2021-06-08",
+    "profit_usdt": -1113.84
+  },
+  {
+    "signal": "short",
+    "datetime": "2021-06-02",
+    "profit_usdt": -2408.68
+  },
+  {
+    "signal": "long",
+    "datetime": "2021-05-28",
+    "profit_usdt": -1413.43
+  },
+  {
+    "signal": "short",
+    "datetime": "2021-05-25",
+    "profit_usdt": 3821.39
+  },
+  {
+    "signal": "long",
+    "datetime": "2021-05-13",
+    "profit_usdt": -768.94
+  },
+  {
+    "signal": "short",
+    "datetime": "2021-05-06",
+    "profit_usdt": -1613.31
+  },
+  {
+    "signal": "long",
+    "datetime": "2021-05-04",
+    "profit_usdt": 465.69
+  },
+  {
+    "signal": "short",
+    "datetime": "2021-04-26",
+    "profit_usdt": -255.79
+  },
+  {
+    "signal": "long",
+    "datetime": "2021-04-18",
+    "profit_usdt": -81.08
+  },
+  {
+    "signal": "short",
+    "datetime": "2021-03-29",
+    "profit_usdt": 271.77
+  },
+  {
+    "signal": "long",
+    "datetime": "2021-03-21",
+    "profit_usdt": -350.5
+  },
+  {
+    "signal": "short",
+    "datetime": "2021-03-04",
+    "profit_usdt": -984.23
+  },
+  {
+    "signal": "long",
+    "datetime": "2021-02-22",
+    "profit_usdt": -2036.27
+  },
+  {
+    "signal": "short",
+    "datetime": "2021-02-16",
+    "profit_usdt": -4327.28
+  },
+  {
+    "signal": "long",
+    "datetime": "2021-02-15",
+    "profit_usdt": 10400.31
+  },
+  {
+    "signal": "short",
+    "datetime": "2021-01-28",
+    "profit_usdt": -1699.26
+  },
+  {
+    "signal": "long",
+    "datetime": "2021-01-22",
+    "profit_usdt": -499.69
+  },
+  {
+    "signal": "short",
+    "datetime": "2021-01-15",
+    "profit_usdt": -3173.33
+  },
+  {
+    "signal": "long",
+    "datetime": "2021-01-11",
+    "profit_usdt": 1152.09
+  },
+  {
+    "signal": "short",
+    "datetime": "2020-12-28",
+    "profit_usdt": -88.75
+  },
+  {
+    "signal": "long",
+    "datetime": "2020-12-21",
+    "profit_usdt": 316.38
+  },
+  {
+    "signal": "short",
+    "datetime": "2020-12-12",
+    "profit_usdt": 424.33
+  },
+  {
+    "signal": "long",
+    "datetime": "2020-11-27",
+    "profit_usdt": 767.58
+  },
+  {
+    "signal": "short",
+    "datetime": "2020-11-06",
+    "profit_usdt": 889.65
+  },
+  {
+    "signal": "long",
+    "datetime": "2020-10-20",
+    "profit_usdt": -890.35
+  },
+  {
+    "signal": "short",
+    "datetime": "2020-10-19",
+    "profit_usdt": -681.16
+  },
+  {
+    "signal": "long",
+    "datetime": "2020-10-17",
+    "profit_usdt": 452.3
+  },
+  {
+    "signal": "short",
+    "datetime": "2020-10-09",
+    "profit_usdt": -476.29
+  },
+  {
+    "signal": "long",
+    "datetime": "2020-10-02",
+    "profit_usdt": 1051.16
+  },
+  {
+    "signal": "short",
+    "datetime": "2020-09-25",
+    "profit_usdt": 1091.78
+  },
+  {
+    "signal": "long",
+    "datetime": "2020-09-15",
+    "profit_usdt": -1243.62
+  },
+  {
+    "signal": "short",
+    "datetime": "2020-09-13",
+    "profit_usdt": 1563.55
+  },
+  {
+    "signal": "long",
+    "datetime": "2020-09-02",
+    "profit_usdt": 595.49
+  },
+  {
+    "signal": "short",
+    "datetime": "2020-08-21",
+    "profit_usdt": -1648.9
+  },
+  {
+    "signal": "long",
+    "datetime": "2020-08-19",
+    "profit_usdt": 3640.93
+  },
+  {
+    "signal": "short",
+    "datetime": "2020-08-01",
+    "profit_usdt": -256.76
+  },
+  {
+    "signal": "long",
+    "datetime": "2020-07-21",
+    "profit_usdt": 4581.63
+  },
+  {
+    "signal": "short",
+    "datetime": "2020-07-02",
+    "profit_usdt": -406.19
+  },
+  {
+    "signal": "long",
+    "datetime": "2020-06-25",
+    "profit_usdt": -454.99
+  },
+  {
+    "signal": "short",
+    "datetime": "2020-06-22",
+    "profit_usdt": 772.5
+  },
+  {
+    "signal": "long",
+    "datetime": "2020-06-11",
+    "profit_usdt": -395.69
+  },
+  {
+    "signal": "short",
+    "datetime": "2020-06-04",
+    "profit_usdt": -1351.45
+  },
+  {
+    "signal": "long",
+    "datetime": "2020-06-02",
+    "profit_usdt": -122.57
+  },
+  {
+    "signal": "short",
+    "datetime": "2020-05-30",
+    "profit_usdt": -907.11
+  },
+  {
+    "signal": "long",
+    "datetime": "2020-05-22",
+    "profit_usdt": -758.63
+  },
+  {
+    "signal": "short",
+    "datetime": "2020-05-21",
+    "profit_usdt": -910.58
+  },
+  {
+    "signal": "long",
+    "datetime": "2020-05-10",
+    "profit_usdt": -1266.11
+  },
+  {
+    "signal": "short",
+    "datetime": "2020-05-09",
+    "profit_usdt": -586.46
+  },
+  {
+    "signal": "long",
+    "datetime": "2020-05-04",
+    "profit_usdt": 902.22
+  },
+  {
+    "signal": "short",
+    "datetime": "2020-04-23",
+    "profit_usdt": -615.17
+  },
+  {
+    "signal": "long",
+    "datetime": "2020-04-20",
+    "profit_usdt": -460.25
+  },
+  {
+    "signal": "short",
+    "datetime": "2020-04-15",
+    "profit_usdt": -1017.37
+  },
+  {
+    "signal": "long",
+    "datetime": "2020-04-10",
+    "profit_usdt": 926.0
+  },
+  {
+    "signal": "short",
+    "datetime": "2020-04-02",
+    "profit_usdt": -653.21
+  },
+  {
+    "signal": "long",
+    "datetime": "2020-03-28",
+    "profit_usdt": -872.57
+  },
+  {
+    "signal": "short",
+    "datetime": "2020-03-20",
+    "profit_usdt": 4076.94
+  },
+  {
+    "signal": "long",
+    "datetime": "2020-03-08",
+    "profit_usdt": -669.15
+  },
+  {
+    "signal": "short",
+    "datetime": "2020-03-03",
+    "profit_usdt": 1305.26
+  },
+  {
+    "signal": "long",
+    "datetime": "2020-02-25",
+    "profit_usdt": -653.43
+  },
+  {
+    "signal": "short",
+    "datetime": "2020-02-21",
+    "profit_usdt": -74.45
+  },
+  {
+    "signal": "long",
+    "datetime": "2020-02-16",
+    "profit_usdt": 96.55
+  },
+  {
+    "signal": "short",
+    "datetime": "2020-02-06",
+    "profit_usdt": -593.06
+  },
+  {
+    "signal": "long",
+    "datetime": "2020-02-01",
+    "profit_usdt": -673.98
+  },
+  {
+    "signal": "short",
+    "datetime": "2020-01-27",
+    "profit_usdt": -551.91
+  },
+  {
+    "signal": "long",
+    "datetime": "2020-01-24",
+    "profit_usdt": -126.4
+  },
+  {
+    "signal": "short",
+    "datetime": "2020-01-14",
+    "profit_usdt": -669.78
+  },
+  {
+    "signal": "long",
+    "datetime": "2020-01-13",
+    "profit_usdt": -449.13
+  },
+  {
+    "signal": "short",
+    "datetime": "2020-01-10",
+    "profit_usdt": -317.56
+  },
+  {
+    "signal": "long",
+    "datetime": "2019-12-30",
+    "profit_usdt": -36.6
+  },
+  {
+    "signal": "short",
+    "datetime": "2019-12-19",
+    "profit_usdt": -422.97
+  },
+  {
+    "signal": "long",
+    "datetime": "2019-12-17",
+    "profit_usdt": 382.99
+  },
+  {
+    "signal": "short",
+    "datetime": "2019-12-12",
+    "profit_usdt": -1046.52
+  },
+  {
+    "signal": "long",
+    "datetime": "2019-12-10",
+    "profit_usdt": -641.06
+  },
+  {
+    "signal": "short",
+    "datetime": "2019-12-07",
+    "profit_usdt": -874.37
+  },
+  {
+    "signal": "long",
+    "datetime": "2019-12-04",
+    "profit_usdt": 37.95
+  },
+  {
+    "signal": "short",
+    "datetime": "2019-11-25",
+    "profit_usdt": 1178.54
+  },
+  {
+    "signal": "long",
+    "datetime": "2019-11-14",
+    "profit_usdt": 3187.58
+  },
+  {
+    "signal": "short",
+    "datetime": "2019-10-25",
+    "profit_usdt": -693.82
+  },
+  {
+    "signal": "long",
+    "datetime": "2019-10-23",
+    "profit_usdt": -413.8
+  },
+  {
+    "signal": "short",
+    "datetime": "2019-10-21",
+    "profit_usdt": -242.92
+  },
+  {
+    "signal": "long",
+    "datetime": "2019-10-16",
+    "profit_usdt": 1431.99
+  },
+  {
+    "signal": "short",
+    "datetime": "2019-09-30",
+    "profit_usdt": 2027.13
+  },
+  {
+    "signal": "long",
+    "datetime": "2019-09-19",
+    "profit_usdt": 4559.73
+  },
+  {
+    "signal": "short",
+    "datetime": "2019-09-07",
+    "profit_usdt": -789.61
+  },
+  {
+    "signal": "long",
+    "datetime": "2019-09-05",
+    "profit_usdt": -1032.62
+  },
+  {
+    "signal": "short",
+    "datetime": "2019-09-02",
+    "profit_usdt": 3261.62
+  },
+  {
+    "signal": "long",
+    "datetime": "2019-08-13",
+    "profit_usdt": -418.54
+  },
+  {
+    "signal": "short",
+    "datetime": "2019-08-11",
+    "profit_usdt": 121.84
+  },
+  {
+    "signal": "long",
+    "datetime": "2019-08-08",
+    "profit_usdt": -802.8
+  },
+  {
+    "signal": "short",
+    "datetime": "2019-08-02",
+    "profit_usdt": -477.54
+  },
+  {
+    "signal": "long",
+    "datetime": "2019-07-27",
+    "profit_usdt": -1170.51
+  },
+  {
+    "signal": "short",
+    "datetime": "2019-07-24",
+    "profit_usdt": 3597.79
+  },
+  {
+    "signal": "long",
+    "datetime": "2019-06-27",
+    "profit_usdt": 3376.05
+  },
+  {
+    "signal": "short",
+    "datetime": "2019-05-25",
+    "profit_usdt": -1437.94
+  },
+  {
+    "signal": "long",
+    "datetime": "2019-05-23",
+    "profit_usdt": -613.11
+  },
+  {
+    "signal": "short",
+    "datetime": "2019-05-16",
+    "profit_usdt": 67.69
+  },
+  {
+    "signal": "long",
+    "datetime": "2019-05-08",
+    "profit_usdt": -15.51
+  }
+]

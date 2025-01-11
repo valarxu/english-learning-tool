@@ -24,7 +24,15 @@ export default function BacktestPage() {
   // 交易对选项
   const symbols = [
     { key: 'BTC', label: 'BTC' },
-    { key: 'ETH', label: 'ETH' }
+    { key: 'ETH', label: 'ETH' },
+    { key: 'SOL', label: 'SOL' },
+    { key: 'DOGE', label: 'DOGE' },
+    { key: 'XRP', label: 'XRP' },
+    { key: 'ADA', label: 'ADA' },
+    { key: 'BNB', label: 'BNB' },
+    { key: 'UNI', label: 'UNI' },
+    { key: 'ATOM', label: 'ATOM' },
+    { key: 'THETA', label: 'THETA' },
   ];
 
   useEffect(() => {
@@ -34,13 +42,20 @@ export default function BacktestPage() {
       
       try {
         // 修改数据加载路径
-        const tradesResponse = await fetch(`/data/jsonData/${activeSymbol.toLowerCase()}_filtered.json`);
+        let dataPath;
+        if (activeStrategy === 'ema-atr') {
+          dataPath = 'data1'
+        }
+        if (activeStrategy === 'supertrend') {
+          dataPath = 'data2'
+        }
+        const tradesResponse = await fetch(`/${dataPath}/jsonData/${activeSymbol.toLowerCase()}_filtered.json`);
         if (!tradesResponse.ok) {
           throw new Error('Failed to load trades data');
         }
         const tradesData = await tradesResponse.json();
         
-        const statsResponse = await fetch(`/data/tradeStats/${activeSymbol.toLowerCase()}_filtered_stats.json`);
+        const statsResponse = await fetch(`/${dataPath}/tradeStats/${activeSymbol.toLowerCase()}_filtered_stats.json`);
         if (!statsResponse.ok) {
           throw new Error('Failed to load stats data');
         }
@@ -202,9 +217,9 @@ export default function BacktestPage() {
                     <p className="text-2xl font-bold text-gray-800">{stats.trade_counts.total}</p>
                   </div>
                   <div className="bg-white/90 rounded-lg p-4 shadow-lg">
-                    <h3 className="text-gray-600 mb-1">多空比例</h3>
+                    <h3 className="text-gray-600 mb-1">胜率</h3>
                     <p className="text-2xl font-bold text-emerald-600">
-                      {stats.trade_counts.long}/{stats.trade_counts.short}
+                      {stats.win_rates.total}%
                     </p>
                   </div>
                   <div className="bg-white/90 rounded-lg p-4 shadow-lg">
