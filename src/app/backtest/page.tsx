@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import ReactECharts from 'echarts-for-react';
@@ -9,11 +9,13 @@ export default function BacktestPage() {
   const [activeStrategy, setActiveStrategy] = useState('ema-atr');
   const [activeSymbol, setActiveSymbol] = useState('BTC');
   const [activeYear, setActiveYear] = useState<string>('2024');
+  const [activeComparisonSymbol, setActiveComparisonSymbol] = useState('BTC');
   const [trades, setTrades] = useState<any[]>([]);
   const [stats, setStats] = useState<any>(null);
   const [years, setYears] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [comparisonData, setComparisonData] = useState<any>(null);
 
   // 策略选项
   const strategies = [
@@ -21,8 +23,8 @@ export default function BacktestPage() {
     { key: 'supertrend', label: 'Supertrend策略', icon: '📈' }
   ];
 
-  // 交易对选项
-  const symbols = [
+  // 使用 useMemo 缓存交易对选项
+  const symbols = useMemo(() => [
     { key: 'BTC', label: 'BTC' },
     { key: 'ETH', label: 'ETH' },
     { key: 'SOL', label: 'SOL' },
@@ -33,7 +35,36 @@ export default function BacktestPage() {
     { key: 'UNI', label: 'UNI' },
     { key: 'ATOM', label: 'ATOM' },
     { key: 'THETA', label: 'THETA' },
-  ];
+  ], []); // 空依赖数组，因为这个数组是静态的
+
+  useEffect(() => {
+    // 将加载对比数据的函数移到 useEffect 内部
+    const loadComparisonData = async () => {
+      try {
+        const strategies = ['ema-atr', 'supertrend'];
+        const comparisonResult: any = {};
+
+        for (const symbol of symbols) {
+          comparisonResult[symbol.key] = {};
+          
+          for (const strategy of strategies) {
+            const dataPath = strategy === 'ema-atr' ? 'data1' : 'data2';
+            const response = await fetch(`/${dataPath}/tradeStats/${symbol.key.toLowerCase()}_filtered_stats.json`);
+            if (response.ok) {
+              const data = await response.json();
+              comparisonResult[symbol.key][strategy] = data;
+            }
+          }
+        }
+
+        setComparisonData(comparisonResult);
+      } catch (error) {
+        console.error('Error loading comparison data:', error);
+      }
+    };
+
+    loadComparisonData();
+  }, [symbols]); // 添加 symbols 作为依赖项
 
   useEffect(() => {
     const loadData = async () => {
@@ -131,6 +162,24 @@ export default function BacktestPage() {
     };
   };
 
+  // 添加计算总计数据的函数
+  const calculateTotalStats = (strategyData: any) => {
+    if (!strategyData) return { totalProfit: 0, avgWinRate: 0 };
+    
+    const years = Object.keys(strategyData);
+    if (years.length === 0) return { totalProfit: 0, avgWinRate: 0 };
+
+    const totalProfit = years.reduce((sum, year) => {
+      return sum + (strategyData[year]?.total_profit || 0);
+    }, 0);
+
+    const avgWinRate = years.reduce((sum, year) => {
+      return sum + (strategyData[year]?.win_rates?.total || 0);
+    }, 0) / years.length;
+
+    return { totalProfit, avgWinRate };
+  };
+
   return (
     <ProtectedRoute>
       <div className="page-gradient-bg">
@@ -183,7 +232,7 @@ export default function BacktestPage() {
           </div>
 
           {/* 年份选择 */}
-          <div className="mb-6 inline-flex bg-white/90 rounded-lg p-1 gap-2 shadow-lg ml-4">
+          <div className="mb-6 inline-flex bg-white/90 rounded-lg p-1 gap-2 shadow-lg">
             {years.map(year => (
               <button
                 key={year}
@@ -247,9 +296,95 @@ export default function BacktestPage() {
               {trades.length > 0 && (
                 <div className="bg-white/90 rounded-lg p-4 shadow-lg">
                   <ReactECharts option={getChartOption()} style={{ height: '400px' }} />
+                  
+                  <div className="ml-8">备注：本金为10000 USDT, 杠杆为1倍</div>
                 </div>
+                
               )}
             </>
+          )}
+
+          {/* 修改策略对比表格 */}
+          {comparisonData && (
+            <div className="mt-8 bg-white/90 rounded-lg p-6 shadow-lg overflow-x-auto">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold">策略对比分析</h2>
+                <div className="flex gap-2">
+                  {symbols.map(symbol => (
+                    <button
+                      key={symbol.key}
+                      onClick={() => setActiveComparisonSymbol(symbol.key)}
+                      className={`px-4 py-2 rounded-lg transition-all duration-300 ${
+                        activeComparisonSymbol === symbol.key
+                          ? 'bg-emerald-500 text-white'
+                          : 'bg-white hover:bg-emerald-50 text-gray-600'
+                      }`}
+                    >
+                      {symbol.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <table className="min-w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="py-2 px-4 text-left">年份</th>
+                    <th className="py-2 px-4 text-left">EMA-ATR收益</th>
+                    <th className="py-2 px-4 text-left">EMA-ATR胜率</th>
+                    <th className="py-2 px-4 text-left">Supertrend收益</th>
+                    <th className="py-2 px-4 text-left">Supertrend胜率</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {comparisonData[activeComparisonSymbol] && 
+                    Object.keys(comparisonData[activeComparisonSymbol]['ema-atr'] || {})
+                      .sort()
+                      .reverse()
+                      .map((year) => (
+                        <tr key={year} className="border-b hover:bg-emerald-50">
+                          <td className="py-2 px-4">{year}</td>
+                          <td className={`py-2 px-4 ${comparisonData[activeComparisonSymbol]['ema-atr']?.[year]?.total_profit >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                            {comparisonData[activeComparisonSymbol]['ema-atr']?.[year]?.total_profit?.toFixed(2) || 'N/A'} USDT
+                          </td>
+                          <td className="py-2 px-4">
+                            {comparisonData[activeComparisonSymbol]['ema-atr']?.[year]?.win_rates?.total?.toFixed(2) || 'N/A'}%
+                          </td>
+                          <td className={`py-2 px-4 ${comparisonData[activeComparisonSymbol]['supertrend']?.[year]?.total_profit >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                            {comparisonData[activeComparisonSymbol]['supertrend']?.[year]?.total_profit?.toFixed(2) || 'N/A'} USDT
+                          </td>
+                          <td className="py-2 px-4">
+                            {comparisonData[activeComparisonSymbol]['supertrend']?.[year]?.win_rates?.total?.toFixed(2) || 'N/A'}%
+                          </td>
+                        </tr>
+                      ))
+                  }
+                  {/* 添加总计行 */}
+                  {comparisonData[activeComparisonSymbol] && (() => {
+                    const emaAtrStats = calculateTotalStats(comparisonData[activeComparisonSymbol]['ema-atr']);
+                    const supertrendStats = calculateTotalStats(comparisonData[activeComparisonSymbol]['supertrend']);
+                    
+                    return (
+                      <tr className="border-t-2 border-gray-200 bg-gray-50 font-semibold">
+                        <td className="py-3 px-4">历年总计</td>
+                        <td className={`py-3 px-4 ${emaAtrStats.totalProfit >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                          {emaAtrStats.totalProfit.toFixed(2)} USDT
+                        </td>
+                        <td className="py-3 px-4">
+                          {emaAtrStats.avgWinRate.toFixed(2)}%
+                        </td>
+                        <td className={`py-3 px-4 ${supertrendStats.totalProfit >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                          {supertrendStats.totalProfit.toFixed(2)} USDT
+                        </td>
+                        <td className="py-3 px-4">
+                          {supertrendStats.avgWinRate.toFixed(2)}%
+                        </td>
+                      </tr>
+                    );
+                  })()}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       </div>
