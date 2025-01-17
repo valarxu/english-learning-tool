@@ -9,12 +9,6 @@ export default function Home() {
   
   const modules = [
     {
-      title: "单词本",
-      description: "按场景分类整理单词，帮助记忆和学习",
-      icon: "📚",
-      href: "/vocabulary"
-    },
-    {
       title: "常用知识",
       description: "日常知识，程序知识，交易知识等",
       icon: "📖",
